@@ -4,16 +4,137 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Default Dark Theme Variables */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border-color: #475569;
+    --accent-color: #3b82f6;
+    --glass-bg: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(71, 85, 105, 0.3);
+  }
+
+  .light-theme {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-muted: #64748b;
+    --border-color: #cbd5e1;
+    --accent-color: #3b82f6;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(203, 213, 225, 0.5);
+  }
+
+  .dark-theme {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+    --border-color: #475569;
+    --accent-color: #3b82f6;
+    --glass-bg: rgba(15, 23, 42, 0.8);
+    --glass-border: rgba(71, 85, 105, 0.3);
+  }
+
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
+  /* Ensure wallpaper background images stay behind everything */
+  body::before {
+    z-index: -200 !important;
+  }
+  
+  .desktop-background::before {
+    z-index: -150 !important;
+  }
+
+  /* Force all wallpaper related elements to stay in background */
+  [style*="background-image"] {
+    z-index: -100 !important;
+  }
+
+  /* Theme-aware utility classes */
+  .theme-bg-primary {
+    background-color: var(--bg-primary);
+  }
+  
+  .theme-bg-secondary {
+    background-color: var(--bg-secondary);
+  }
+  
+  .theme-bg-tertiary {
+    background-color: var(--bg-tertiary);
+  }
+  
+  .theme-text-primary {
+    color: var(--text-primary);
+  }
+  
+  .theme-text-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .theme-text-muted {
+    color: var(--text-muted);
+  }
+  
+  .theme-border {
+    border-color: var(--border-color);
+  }
+  
+  .theme-glass-bg {
+    background-color: var(--glass-bg);
+  }
+  
+  .theme-glass-border {
+    border-color: var(--glass-border);
+  }
+
   body {
     font-family: 'Ubuntu', sans-serif;
     overflow: hidden;
-    background: #1e293b;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+
+  /* When live wallpaper is active, remove body background */
+  body.live-wallpaper-active {
+    background: transparent;
+  }
+
+  /* Live wallpaper containers */
+  .live-wallpaper {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: -100 !important;
+    object-fit: cover !important;
+    transition: opacity 1s ease-in-out !important;
+    pointer-events: none !important;
+  }
+
+  .wallpaper-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
   }
 }
 
@@ -23,6 +144,13 @@
       radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
       radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
       linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  }
+
+  .light-theme .ubuntu-desktop-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+      linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 50%, #cbd5e1 100%);
   }
 
   /* Enhanced scrollbar styling */
@@ -114,5 +242,38 @@
 
   .duration-200 {
     animation-duration: 0.2s;
+  }
+
+  /* Theme-aware utility classes */
+  .bg-theme-primary {
+    background-color: var(--bg-primary) !important;
+  }
+
+  .bg-theme-secondary {
+    background-color: var(--bg-secondary) !important;
+  }
+
+  .bg-theme-tertiary {
+    background-color: var(--bg-tertiary) !important;
+  }
+
+  .text-theme-primary {
+    color: var(--text-primary) !important;
+  }
+
+  .text-theme-secondary {
+    color: var(--text-secondary) !important;
+  }
+
+  .border-theme {
+    border-color: var(--border-color) !important;
+  }
+
+  .bg-theme-glass {
+    background-color: var(--glass-bg) !important;
+  }
+
+  .border-theme-glass {
+    border-color: var(--glass-border) !important;
   }
 }

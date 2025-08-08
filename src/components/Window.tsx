@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { UbuntuIcon } from './UbuntuIcon';
 
 interface WindowProps {
   id: string;
@@ -222,8 +223,8 @@ const Window: React.FC<WindowProps> = ({
         boxShadow: isFullscreen ? 'none' : '0 20px 50px rgba(0, 0, 0, 0.25)',
         borderRadius: isFullscreen ? '0px' : '12px',
         overflow: 'hidden',
-        backgroundColor: 'white',
-        border: isFullscreen ? 'none' : '1px solid rgba(0, 0, 0, 0.1)',
+        backgroundColor: 'var(--bg-primary)',
+        border: isFullscreen ? 'none' : '1px solid var(--border-color)',
         transition: isFullscreen ? 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' : 'box-shadow 0.2s ease',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)'
@@ -237,8 +238,8 @@ const Window: React.FC<WindowProps> = ({
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '12px 16px',
-          backgroundColor: isFullscreen ? 'rgba(245, 245, 247, 1)' : 'rgba(245, 245, 247, 0.8)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.1)',
+          backgroundColor: 'var(--bg-secondary)',
+          borderBottom: '1px solid var(--border-color)',
           fontSize: '14px',
           cursor: isFullscreen ? 'default' : 'move',
           userSelect: 'none',
@@ -250,41 +251,8 @@ const Window: React.FC<WindowProps> = ({
         }}
         onMouseDown={isFullscreen ? undefined : handleMouseDown}
       >
-        {/* macOS Traffic Light Buttons */}
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative', zIndex: 1001 }}>
-          {/* Close */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose(id);
-            }}
-            style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              backgroundColor: '#ff5f57',
-              border: '0.5px solid rgba(0, 0, 0, 0.1)',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '8px',
-              color: 'rgba(0, 0, 0, 0.6)',
-              position: 'relative',
-              zIndex: 1002
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff3b30';
-              e.currentTarget.textContent = '×';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ff5f57';
-              e.currentTarget.textContent = '';
-            }}
-            title="Close"
-          />
-          
+        {/* Ubuntu-style Window Controls */}
+        <div style={{ display: 'flex', gap: '4px', alignItems: 'center', position: 'relative', zIndex: 1001 }}>
           {/* Minimize */}
           <button
             onClick={(e) => {
@@ -292,32 +260,30 @@ const Window: React.FC<WindowProps> = ({
               onMinimize(id);
             }}
             style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              backgroundColor: '#ffbd2e',
-              border: '0.5px solid rgba(0, 0, 0, 0.1)',
+              width: '20px',
+              height: '20px',
+              borderRadius: '4px',
+              backgroundColor: 'rgba(226, 221, 221, 0.94)', // brighter by default
+              border: 'none',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '8px',
-              color: 'rgba(0, 0, 0, 0.6)',
               position: 'relative',
               zIndex: 1002
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#ffcc02';
-              e.currentTarget.textContent = '−';
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.35)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#ffbd2e';
-              e.currentTarget.textContent = '';
+              e.currentTarget.style.backgroundColor = 'rgba(226, 221, 221, 0.94)';
             }}
             title="Minimize"
-          />
-          
+          >
+            <UbuntuIcon name="minimize" size="w-4 h-4" className="text-white" />
+          </button>
+
           {/* Maximize/Restore */}
           <button
             onClick={(e) => {
@@ -325,38 +291,68 @@ const Window: React.FC<WindowProps> = ({
               onToggleFullscreen(id);
             }}
             style={{
-              width: '12px',
-              height: '12px',
-              borderRadius: '50%',
-              backgroundColor: '#28ca42',
-              border: '0.5px solid rgba(0, 0, 0, 0.1)',
+              width: '20px',
+              height: '20px',
+              borderRadius: '4px',
+              backgroundColor: 'rgba(226, 221, 221, 0.94)',
+              border: 'none',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '6px',
-              color: 'rgba(0, 0, 0, 0.6)',
               position: 'relative',
               zIndex: 1002
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#30d158';
-              e.currentTarget.textContent = isFullscreen ? '⧉' : '+';
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.35)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#28ca42';
-              e.currentTarget.textContent = '';
+              e.currentTarget.style.backgroundColor = 'rgba(226, 221, 221, 0.94)';
             }}
             title={isFullscreen ? "Restore" : "Maximize"}
-          />
+          >
+            <UbuntuIcon name="maximize" size="w-4 h-4" className="text-white" />
+          </button>
+
+          {/* Close */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose(id);
+            }}
+            style={{
+              width: '20px',
+              height: '20px',
+              borderRadius: '4px',
+              backgroundColor: 'rgba(255, 0, 0, 0.85)',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+              zIndex: 1002
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 0, 0, 0.85)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.)';
+            }}
+            title="Close"
+          >
+            <UbuntuIcon name="close" size="w-4 h-4" className="text-white" />
+          </button>
         </div>
-        
+
+
         {/* Window Title */}
-        <div 
-          style={{ 
+        <div
+          style={{
             fontWeight: '500',
-            color: '#1d1d1f',
+            color: 'var(--text-primary)',
             position: 'absolute',
             left: '50%',
             transform: 'translateX(-50%)',
@@ -366,7 +362,7 @@ const Window: React.FC<WindowProps> = ({
         >
           {title}
         </div>
-        
+
         {/* Right side placeholder for symmetry */}
         <div style={{ width: '60px' }} />
       </div>
@@ -376,13 +372,13 @@ const Window: React.FC<WindowProps> = ({
         style={{
           width: '100%',
           height: `${(isFullscreen ? (window.innerHeight - 32 - 80) : size.height) - 44}px`,
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-primary)',
           overflow: 'auto'
         }}
       >
         {children}
       </div>
-      
+
       {/* Resize Handles - Only show when not fullscreen */}
       {!isFullscreen && (
         <>
@@ -435,7 +431,7 @@ const Window: React.FC<WindowProps> = ({
             }}
             onMouseDown={(e) => handleResizeStart(e, 'bottom-right')}
           />
-          
+
           {/* Edge handles */}
           <div
             style={{

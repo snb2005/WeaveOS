@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useWindowStore } from '../store/windowStore';
 
 const TaskBar: React.FC = () => {
-  const { windows, focusWindow, minimizeWindow, closeWindow } = useWindowStore();
+  const { windows, focusWindow, closeWindow } = useWindowStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Get minimized windows

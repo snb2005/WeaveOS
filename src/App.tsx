@@ -7,7 +7,7 @@ import { useWindowManager } from './hooks/useWindowManager';
 import { VFSDemo } from './filesystem/vfsDemo';
 import runVFSValidation from './filesystem/vfsValidation';
 import { vfsManager } from './filesystem/vfsManager';
-import { initializeTimeBasedWallpaper } from './utils/timeBasedWallpaper';
+import { WallpaperManager, ThemeManager } from './utils/wallpaperManager';
 import { useEffect } from 'react';
 
 function App() {
@@ -43,25 +43,27 @@ function App() {
     }, 2000);
   }, []);
 
-  // Initialize time-based wallpaper system
+  // Initialize wallpaper and theme system
   useEffect(() => {
-    console.log('🌅 Initializing time-based wallpaper system...');
+    console.log('🌅 Initializing wallpaper and theme system...');
     
-    // Clear any existing wallpaper preference to use time-based as default
+    // Initialize theme and wallpaper managers
+    const themeManager = ThemeManager.getInstance();
+    const wallpaperManager = WallpaperManager.getInstance();
+    
+    themeManager.initializeFromStorage();
+    wallpaperManager.initializeFromStorage();
+    
+    // Set default to live wallpaper if no preference exists
     const existingWallpaper = localStorage.getItem('weave-wallpaper');
     if (!existingWallpaper) {
-      localStorage.setItem('weave-wallpaper', 'time-based');
-      console.log('🌅 Set default wallpaper to time-based');
+      localStorage.setItem('weave-wallpaper', 'live');
+      wallpaperManager.setWallpaper('live');
+      console.log('🌅 Set default wallpaper to live wallpaper');
     }
 
-    // Initialize the global time-based wallpaper (fallback for body element)
-    const cleanup = initializeTimeBasedWallpaper({
-      target: 'body',
-      autoUpdate: true,
-      updateInterval: 60 * 60 * 1000 // 1 hour
-    });
-
-    return cleanup || undefined;
+    // Note: Time-based wallpaper is disabled when using live wallpaper to avoid conflicts
+    console.log('🖼️ Wallpaper system initialized');
   }, []);
 
   const handleCreateFile = () => {

@@ -80,6 +80,16 @@ export const APP_REGISTRY: Record<string, AppConfig> = {
     height: 500,
     description: 'Audio and video media player',
   },
+  
+  IconDemo: {
+    id: 'IconDemo',
+    name: 'Icon Gallery',
+    icon: '🎨',
+    allowMultiple: false,
+    width: 900,
+    height: 700,
+    description: 'Showcase of Papirus Ubuntu icons',
+  },
 };
 
 // Helper functions for working with the registry

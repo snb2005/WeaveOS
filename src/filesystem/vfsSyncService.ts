@@ -92,7 +92,8 @@ class VFSSyncService {
           case 'delete':
             try {
               // Try to determine if it was a file or folder based on VFS
-              const items = vfs.listDir(operation.path);
+              // List directory to refresh (result not used directly)
+              vfs.listDir(operation.path);
               listener.onFolderDeleted?.(operation.path, operation.source);
             } catch {
               listener.onFileDeleted?.(operation.path, operation.source);

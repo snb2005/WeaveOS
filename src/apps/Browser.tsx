@@ -19,10 +19,10 @@ interface Bookmark {
 }
 
 interface BrowserProps {
-  isElectron?: boolean;
+  windowId?: string;
 }
 
-const Browser: React.FC<BrowserProps> = ({ isElectron = false }) => {
+const Browser: React.FC<BrowserProps> = () => {
   const [tabs, setTabs] = useState<Tab[]>([
     {
       id: '1',

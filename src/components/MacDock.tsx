@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useWindowStore } from '../store/windowStore';
 import { getAppConfig } from '../registry/appRegistry';
-import Terminal from '../apps/Terminal-enhanced';
-import Files from '../apps/Files-enhanced';
+import { UbuntuIcon } from './UbuntuIcon';
+import type { IconType } from './UbuntuIcon';
+import Terminal from '../apps/Terminal';
+import Files from '../apps/Files';
 import Calculator from '../apps/Calculator';
-import Settings from '../apps/Settings-enhanced';
-import TextEditor from '../apps/TextEditor-enhanced';
+import Settings from '../apps/Settings';
+import TextEditor from '../apps/TextEditor';
 import Browser from '../apps/Browser';
+import IconDemoApp from '../apps/IconDemoApp';
 
 interface DockItem {
   id: string;
   name: string;
-  icon: string;
+  icon: IconType;
 }
 
 // App component mapping
@@ -49,6 +52,8 @@ const createAppComponent = (appName: string, windowId?: string, props?: any) => 
       return <TextEditor {...props} windowId={windowId} />;
     case 'Browser':
       return <Browser {...props} windowId={windowId} />;
+    case 'IconDemo':
+      return <IconDemoApp {...props} windowId={windowId} />;
     default:
       return <div className="p-4">App not found: {appName}</div>;
   }
@@ -62,13 +67,14 @@ const MacDock: React.FC = () => {
   const [showMinimizedList, setShowMinimizedList] = useState<string | null>(null);
 
   const dockItems: DockItem[] = [
-    { id: 'Files', name: 'Files', icon: '📁' },
-    { id: 'Terminal', name: 'Terminal', icon: '💻' },
-    { id: 'TextEditor', name: 'Text Editor', icon: '📝' },
-    { id: 'Calculator', name: 'Calculator', icon: '🧮' },
-    { id: 'Browser', name: 'Browser', icon: '🌐' },
-    { id: 'Settings', name: 'Settings', icon: '⚙️' },
-    { id: 'Media Player', name: 'Media Player', icon: '🎵' },
+    { id: 'Files', name: 'Files', icon: 'file-manager' },
+    { id: 'Terminal', name: 'Terminal', icon: 'terminal' },
+    { id: 'TextEditor', name: 'Text Editor', icon: 'file' },
+    { id: 'Calculator', name: 'Calculator', icon: 'calculator' },
+    { id: 'Browser', name: 'Browser', icon: 'browser' },
+    { id: 'Settings', name: 'Settings', icon: 'settings' },
+    { id: 'IconDemo', name: 'Icon Gallery', icon: 'palette' },
+    { id: 'Media Player', name: 'Media Player', icon: 'media-player' },
   ];
 
   const handleAppClick = (appId: string) => {
@@ -202,7 +208,7 @@ const MacDock: React.FC = () => {
       isHidden ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`}>
       {/* Dock Container */}
-      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-2 border border-white/20 shadow-2xl">
+      <div className="bg-theme-glass backdrop-blur-md rounded-2xl p-2 border border-theme-glass shadow-2xl">
         <div className="flex items-center space-x-1">
           {dockItems.map((item) => {
             const isRunning = runningApps.includes(item.id);
@@ -247,7 +253,7 @@ const MacDock: React.FC = () => {
                           className="w-full flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-700/50
                             transition-all duration-200 text-left"
                         >
-                          <span className="text-lg">{item.icon}</span>
+                          <UbuntuIcon name={item.icon} size="w-6 h-6" />
                           <div className="flex-1 min-w-0">
                             <div className="text-white text-sm font-medium truncate">
                               {window.title}
@@ -304,9 +310,11 @@ const MacDock: React.FC = () => {
                     ${isHovered ? 'scale-105' : 'scale-100'}
                   `}
                 >
-                  <span className="text-3xl filter drop-shadow-sm">
-                    {item.icon}
-                  </span>
+                  <UbuntuIcon 
+                    name={item.icon} 
+                    size="w-10 h-10" 
+                    className="filter drop-shadow-sm"
+                  />
                 </button>
                 
                 {/* Running Indicator */}
