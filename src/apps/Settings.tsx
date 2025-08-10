@@ -38,7 +38,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   fontSize: 14,
   brightness: 80,
   volume: 50,
-  wallpaper: 'gradient-blue',
+  wallpaper: 'default',
   language: 'en-US',
   autoSave: true,
   notifications: true,
@@ -107,9 +107,9 @@ const AppearanceSettings = ({ settings, updateSettings }: { settings: AppSetting
     
     // If the removed wallpaper was currently selected, switch to default
     if (settings.wallpaper === id) {
-      updateSettings({ wallpaper: 'gradient-blue' });
+      updateSettings({ wallpaper: 'default' });
       const wallpaperManager = WallpaperManager.getInstance();
-      wallpaperManager.setWallpaper('gradient-blue');
+      wallpaperManager.setWallpaper('default');
     }
   };
 
@@ -120,11 +120,8 @@ const AppearanceSettings = ({ settings, updateSettings }: { settings: AppSetting
   ];
 
   const wallpapers = [
-    { id: 'live', name: 'Live Wallpaper', preview: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500' },
-    { id: 'gradient-blue', name: 'Ocean Gradient', preview: 'bg-gradient-to-br from-blue-600 to-purple-700' },
-    { id: 'gradient-sunset', name: 'Sunset Gradient', preview: 'bg-gradient-to-br from-orange-400 to-red-600' },
-    { id: 'gradient-forest', name: 'Forest Gradient', preview: 'bg-gradient-to-br from-green-600 to-teal-700' },
-    { id: 'gradient-space', name: 'Space Gradient', preview: 'bg-gradient-to-br from-purple-900 to-black' }
+    { id: 'default', name: 'Default', preview: 'bg-gray-800', imageUrl: '/images/default.jpg' },
+    { id: 'live', name: 'Live Wallpaper', preview: 'bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500' }
   ];
 
   const iconSizes = [
@@ -189,9 +186,15 @@ const AppearanceSettings = ({ settings, updateSettings }: { settings: AppSetting
                   : 'border-zinc-600/50 hover:border-white/40'
               }`}
             >
-              <div className={`w-full h-12 rounded ${wallpaper.preview} ${
-                wallpaper.id === 'live' ? 'animate-pulse' : ''
-              }`}>
+              <div className={`w-full h-12 rounded ${
+                wallpaper.id === 'default' 
+                  ? 'bg-cover bg-center' 
+                  : wallpaper.id === 'live' 
+                    ? `${wallpaper.preview} animate-pulse` 
+                    : wallpaper.preview
+                }`}
+                style={wallpaper.id === 'default' ? { backgroundImage: `url(${wallpaper.imageUrl})` } : {}}
+              >
                 {wallpaper.id === 'live' && (
                   <div className="flex items-center justify-center h-full text-theme-primary text-xs font-bold">
                     LIVE

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Terminal as XTerminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
-import { vfsSyncService } from '../filesystem/vfsSyncService';
+import { vfsSyncService } from '../services/vfsSyncService';
 import { useTheme } from '../hooks/useTheme';
 
 class EnhancedTerminalShell {
@@ -36,7 +36,7 @@ class EnhancedTerminalShell {
     this.terminal.write(`\x1b[36muser@weave\x1b[0m:\x1b[34m${shortPath}\x1b[0m$ `);
   }
 
-  private executeCommand(commandLine: string) {
+  private async executeCommand(commandLine: string) {
     const trimmed = commandLine.trim();
     if (!trimmed) {
       this.terminal.writeln('');
@@ -65,11 +65,11 @@ class EnhancedTerminalShell {
         // Directory operations
         case 'ls':
         case 'dir':
-          this.listDirectory(params);
+          await this.listDirectory(params);
           break;
 
         case 'cd':
-          this.changeDirectory(params);
+          await this.changeDirectory(params);
           break;
 
         case 'pwd':
@@ -77,64 +77,64 @@ class EnhancedTerminalShell {
           break;
 
         case 'mkdir':
-          this.makeDirectory(params);
+          await this.makeDirectory(params);
           break;
 
         case 'rmdir':
-          this.removeDirectory(params);
+          await this.removeDirectory(params);
           break;
 
         // File operations
         case 'touch':
-          this.createFile(params);
+          await this.createFile(params);
           break;
 
         case 'cat':
-          this.displayFile(params);
+          await this.displayFile(params);
           break;
 
         case 'echo':
-          this.echoText(params, commandLine);
+          await this.echoText(params, commandLine);
           break;
 
         case 'cp':
-          this.copyFile(params);
+          await this.copyFile(params);
           break;
 
         case 'mv':
-          this.moveFile(params);
+          await this.moveFile(params);
           break;
 
         case 'rm':
-          this.removeFile(params);
+          await this.removeFile(params);
           break;
 
         case 'find':
-          this.findFiles(params);
+          await this.findFiles(params);
           break;
 
         case 'grep':
-          this.grepText(params);
+          await this.grepText(params);
           break;
 
         case 'head':
-          this.headFile(params);
+          await this.headFile(params);
           break;
 
         case 'tail':
-          this.tailFile(params);
+          await this.tailFile(params);
           break;
 
         case 'wc':
-          this.wordCount(params);
+          await this.wordCount(params);
           break;
 
         case 'du':
-          this.diskUsage(params);
+          await this.diskUsage(params);
           break;
 
         case 'tree':
-          this.showTree(params);
+          await this.showTree(params);
           break;
 
         // System information
@@ -186,11 +186,11 @@ class EnhancedTerminalShell {
 
         // Text processing
         case 'sort':
-          this.sortText(params);
+          await this.sortText(params);
           break;
 
         case 'uniq':
-          this.uniqueLines(params);
+          await this.uniqueLines(params);
           break;
 
         // Archive operations
@@ -354,7 +354,7 @@ class EnhancedTerminalShell {
     this.terminal.writeln('  \x1b[32mexit\x1b[0m               - Exit terminal');
   }
 
-  private listDirectory(params: string[]) {
+  private async listDirectory(params: string[]) {
     const flags = params.filter(p => p.startsWith('-'));
     const paths = params.filter(p => !p.startsWith('-'));
     const targetPath = paths.length > 0 ? this.resolvePath(paths[0]) : this.currentDirectory;
@@ -362,7 +362,7 @@ class EnhancedTerminalShell {
     const longFormat = flags.includes('-l') || flags.includes('-la') || flags.includes('-al');
     
     try {
-      const items = vfsSyncService.listDir(targetPath);
+      const items = await vfsSyncService.listDir(targetPath);
       
       if (items.length === 0) {
         this.terminal.writeln('\x1b[90m(empty directory)\x1b[0m');
@@ -409,7 +409,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private changeDirectory(params: string[]) {
+  private async changeDirectory(params: string[]) {
     if (params.length === 0) {
       this.currentDirectory = '/home/user';
       this.environment['PWD'] = this.currentDirectory;
@@ -419,7 +419,7 @@ class EnhancedTerminalShell {
     const targetPath = this.resolvePath(params[0]);
     
     try {
-      vfsSyncService.listDir(targetPath);
+      await vfsSyncService.listDir(targetPath);
       this.currentDirectory = targetPath;
       this.environment['PWD'] = this.currentDirectory;
     } catch (error) {
@@ -431,7 +431,7 @@ class EnhancedTerminalShell {
     this.terminal.writeln(`\x1b[37m${this.currentDirectory}\x1b[0m`);
   }
 
-  private makeDirectory(params: string[]) {
+  private async makeDirectory(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mmkdir: missing operand\x1b[0m');
       return;
@@ -439,77 +439,77 @@ class EnhancedTerminalShell {
     
     const dirs = params.filter(p => !p.startsWith('-'));
     
-    dirs.forEach(dir => {
+    for (const dir of dirs) {
       const targetPath = this.resolvePath(dir);
       try {
-        vfsSyncService.createFolder(targetPath);
+        await vfsSyncService.createFolder(targetPath, 'terminal');
         this.terminal.writeln(`\x1b[32mDirectory created: ${targetPath}\x1b[0m`);
       } catch (error) {
         this.terminal.writeln(`\x1b[31mmkdir: cannot create directory '${targetPath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
       }
-    });
+    }
   }
 
-  private removeDirectory(params: string[]) {
+  private async removeDirectory(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mrmdir: missing operand\x1b[0m');
       return;
     }
     
-    params.forEach(dir => {
+    for (const dir of params) {
       const targetPath = this.resolvePath(dir);
       try {
-        vfsSyncService.deleteNode(targetPath);
+        await vfsSyncService.deleteNode(targetPath, 'terminal');
         this.terminal.writeln(`\x1b[32mDirectory removed: ${targetPath}\x1b[0m`);
       } catch (error) {
         this.terminal.writeln(`\x1b[31mrmdir: failed to remove '${targetPath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
       }
-    });
+    }
   }
 
-  private createFile(params: string[]) {
+  private async createFile(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mtouch: missing file operand\x1b[0m');
       return;
     }
     
-    params.forEach(file => {
+    for (const file of params) {
       const targetPath = this.resolvePath(file);
       try {
         // Check if file already exists
-        try {
-          vfsSyncService.getFileContent(targetPath);
+        const exists = await vfsSyncService.exists(targetPath);
+        if (exists) {
           // File exists, just update modified time (simulated)
           this.terminal.writeln(`\x1b[33mFile already exists: ${targetPath}\x1b[0m`);
-        } catch {
+        } else {
           // File doesn't exist, create it
-          vfsSyncService.createFile(targetPath, '');
+          await vfsSyncService.createFile(targetPath, '', 'terminal');
           this.terminal.writeln(`\x1b[32mFile created: ${targetPath}\x1b[0m`);
         }
       } catch (error) {
         this.terminal.writeln(`\x1b[31mtouch: cannot create '${targetPath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
       }
-    });
+    }
   }
 
-  private displayFile(params: string[]) {
+  private async displayFile(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mcat: missing file operand\x1b[0m');
       return;
     }
     
-    params.forEach(file => {
+    for (const file of params) {
       const targetPath = this.resolvePath(file);
       try {
-        const content = vfsSyncService.getFileContent(targetPath);
+        const content = await vfsSyncService.getFileContent(targetPath);
         this.terminal.writeln(`\x1b[37m${content}\x1b[0m`);
       } catch (error) {
         this.terminal.writeln(`\x1b[31mcat: ${targetPath}: No such file or directory\x1b[0m`);
       }
-    });
+    }
   }
 
-  private echoText(_params: string[], fullCommand: string) {
+  private async echoText(_params: string[], fullCommand: string) {
     // Extract the text after 'echo'
     const echoIndex = fullCommand.toLowerCase().indexOf('echo');
     const text = fullCommand.slice(echoIndex + 4).trim();
@@ -524,14 +524,14 @@ class EnhancedTerminalShell {
         if (text.includes('>>')) {
           // Append mode
           try {
-            const existing = vfsSyncService.getFileContent(filePath);
-            vfsSyncService.updateFile(filePath, existing + content + '\n');
+            const existing = await vfsSyncService.getFileContent(filePath);
+            await vfsSyncService.updateFile(filePath, existing + content + '\n', 'terminal');
           } catch {
-            vfsSyncService.createFile(filePath, content + '\n');
+            await vfsSyncService.createFile(filePath, content + '\n', 'terminal');
           }
         } else {
           // Overwrite mode
-          vfsSyncService.createFile(filePath, content + '\n');
+          await vfsSyncService.createFile(filePath, content + '\n', 'terminal');
         }
         this.terminal.writeln(`\x1b[32mOutput written to: ${filePath}\x1b[0m`);
       } catch (error) {
@@ -543,7 +543,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private copyFile(params: string[]) {
+  private async copyFile(params: string[]) {
     if (params.length < 2) {
       this.terminal.writeln('\x1b[31mcp: missing file operand\x1b[0m');
       this.terminal.writeln('Usage: cp <source> <destination>');
@@ -554,15 +554,15 @@ class EnhancedTerminalShell {
     const destPath = this.resolvePath(params[1]);
     
     try {
-      const content = vfsSyncService.getFileContent(sourcePath);
-      vfsSyncService.createFile(destPath, content);
+      const content = await vfsSyncService.getFileContent(sourcePath);
+      await vfsSyncService.createFile(destPath, content, 'terminal');
       this.terminal.writeln(`\x1b[32mCopied: ${sourcePath} -> ${destPath}\x1b[0m`);
     } catch (error) {
       this.terminal.writeln(`\x1b[31mcp: cannot copy '${sourcePath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
     }
   }
 
-  private moveFile(params: string[]) {
+  private async moveFile(params: string[]) {
     if (params.length < 2) {
       this.terminal.writeln('\x1b[31mmv: missing file operand\x1b[0m');
       this.terminal.writeln('Usage: mv <source> <destination>');
@@ -573,14 +573,20 @@ class EnhancedTerminalShell {
     const destPath = this.resolvePath(params[1]);
     
     try {
-      vfsSyncService.moveNode(sourcePath, destPath);
+      // Copy the file first
+      const content = await vfsSyncService.getFileContent(sourcePath);
+      await vfsSyncService.createFile(destPath, content, 'terminal');
+      
+      // Then delete the original
+      await vfsSyncService.deleteNode(sourcePath, 'terminal');
+      
       this.terminal.writeln(`\x1b[32mMoved: ${sourcePath} -> ${destPath}\x1b[0m`);
     } catch (error) {
       this.terminal.writeln(`\x1b[31mmv: cannot move '${sourcePath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
     }
   }
 
-  private removeFile(params: string[]) {
+  private async removeFile(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mrm: missing operand\x1b[0m');
       return;
@@ -589,20 +595,20 @@ class EnhancedTerminalShell {
     const force = params.includes('-f');
     const files = params.filter(p => !p.startsWith('-'));
     
-    files.forEach(file => {
+    for (const file of files) {
       const targetPath = this.resolvePath(file);
       try {
-        vfsSyncService.deleteNode(targetPath);
+        await vfsSyncService.deleteNode(targetPath, 'terminal');
         this.terminal.writeln(`\x1b[32mRemoved: ${targetPath}\x1b[0m`);
       } catch (error) {
         if (!force) {
           this.terminal.writeln(`\x1b[31mrm: cannot remove '${targetPath}': ${error instanceof Error ? error.message : 'Unknown error'}\x1b[0m`);
         }
       }
-    });
+    }
   }
 
-  private findFiles(params: string[]) {
+  private async findFiles(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mfind: missing search pattern\x1b[0m');
       return;
@@ -614,10 +620,10 @@ class EnhancedTerminalShell {
     this.terminal.writeln(`\x1b[33mSearching for "${pattern}" in ${searchPath}...\x1b[0m`);
     
     // Simple pattern matching (could be enhanced)
-    const findInDirectory = (path: string, level: number = 0): void => {
+    const findInDirectory = async (path: string, level: number = 0): Promise<void> => {
       try {
-        const items = vfsSyncService.listDir(path);
-        items.forEach((item: any) => {
+        const items = await vfsSyncService.listDir(path);
+        for (const item of items) {
           const fullPath = path === '/' ? `/${item.name}` : `${path}/${item.name}`;
           
           if (item.name.includes(pattern)) {
@@ -625,18 +631,18 @@ class EnhancedTerminalShell {
           }
           
           if (item.type === 'folder' && level < 10) { // Prevent infinite recursion
-            findInDirectory(fullPath, level + 1);
+            await findInDirectory(fullPath, level + 1);
           }
-        });
+        }
       } catch (error) {
         // Skip inaccessible directories
       }
     };
     
-    findInDirectory(searchPath);
+    await findInDirectory(searchPath);
   }
 
-  private grepText(params: string[]) {
+  private async grepText(params: string[]) {
     if (params.length < 2) {
       this.terminal.writeln('\x1b[31mgrep: missing pattern or file\x1b[0m');
       this.terminal.writeln('Usage: grep <pattern> <file>');
@@ -647,7 +653,7 @@ class EnhancedTerminalShell {
     const filePath = this.resolvePath(params[1]);
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const lines = content.split('\n');
       let matchCount = 0;
       
@@ -666,7 +672,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private headFile(params: string[]) {
+  private async headFile(params: string[]) {
     const lines = 10; // Default head lines
     const filePath = params.length > 0 ? this.resolvePath(params[0]) : '';
     
@@ -676,7 +682,7 @@ class EnhancedTerminalShell {
     }
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const fileLines = content.split('\n');
       const displayLines = fileLines.slice(0, lines);
       
@@ -688,7 +694,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private tailFile(params: string[]) {
+  private async tailFile(params: string[]) {
     const lines = 10; // Default tail lines
     const filePath = params.length > 0 ? this.resolvePath(params[0]) : '';
     
@@ -698,7 +704,7 @@ class EnhancedTerminalShell {
     }
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const fileLines = content.split('\n');
       const displayLines = fileLines.slice(-lines);
       
@@ -710,7 +716,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private wordCount(params: string[]) {
+  private async wordCount(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31mwc: missing file operand\x1b[0m');
       return;
@@ -719,7 +725,7 @@ class EnhancedTerminalShell {
     const filePath = this.resolvePath(params[0]);
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const lines = content.split('\n').length;
       const words = content.split(/\s+/).filter((w: any) => w.length > 0).length;
       const chars = content.length;
@@ -730,11 +736,11 @@ class EnhancedTerminalShell {
     }
   }
 
-  private diskUsage(params: string[]) {
+  private async diskUsage(params: string[]) {
     const path = params.length > 0 ? this.resolvePath(params[0]) : this.currentDirectory;
     
     try {
-      const items = vfsSyncService.listDir(path);
+      const items = await vfsSyncService.listDir(path);
       let totalSize = 0;
       
       items.forEach((item: any) => {
@@ -749,14 +755,15 @@ class EnhancedTerminalShell {
     }
   }
 
-  private showTree(params: string[]) {
+  private async showTree(params: string[]) {
     const startPath = params.length > 0 ? this.resolvePath(params[0]) : this.currentDirectory;
     
-    const showTreeRecursive = (path: string, prefix: string = '', isLast: boolean = true): void => {
+    const showTreeRecursive = async (path: string, prefix: string = '', isLast: boolean = true): Promise<void> => {
       try {
-        const items = vfsSyncService.listDir(path);
+        const items = await vfsSyncService.listDir(path);
         
-        items.forEach((item: any, index: any) => {
+        for (let index = 0; index < items.length; index++) {
+          const item = items[index];
           const isLastItem = index === items.length - 1;
           const currentPrefix = prefix + (isLast ? '└── ' : '├── ');
           const nextPrefix = prefix + (isLast ? '    ' : '│   ');
@@ -768,16 +775,16 @@ class EnhancedTerminalShell {
           
           if (item.type === 'folder') {
             const fullPath = path === '/' ? `/${item.name}` : `${path}/${item.name}`;
-            showTreeRecursive(fullPath, nextPrefix, isLastItem);
+            await showTreeRecursive(fullPath, nextPrefix, isLastItem);
           }
-        });
+        }
       } catch (error) {
         // Skip inaccessible directories
       }
     };
     
     this.terminal.writeln(`\x1b[36m${startPath}\x1b[0m`);
-    showTreeRecursive(startPath);
+    await showTreeRecursive(startPath);
   }
 
   private showSystemInfo(params: string[]) {
@@ -852,7 +859,7 @@ class EnhancedTerminalShell {
     this.terminal.writeln('\x1b[32mDownload complete\x1b[0m');
   }
 
-  private sortText(params: string[]) {
+  private async sortText(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31msort: missing file operand\x1b[0m');
       return;
@@ -861,7 +868,7 @@ class EnhancedTerminalShell {
     const filePath = this.resolvePath(params[0]);
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const lines = content.split('\n').sort();
       
       lines.forEach((line: any) => {
@@ -872,7 +879,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private uniqueLines(params: string[]) {
+  private async uniqueLines(params: string[]) {
     if (params.length === 0) {
       this.terminal.writeln('\x1b[31muniq: missing file operand\x1b[0m');
       return;
@@ -881,7 +888,7 @@ class EnhancedTerminalShell {
     const filePath = this.resolvePath(params[0]);
     
     try {
-      const content = vfsSyncService.getFileContent(filePath);
+      const content = await vfsSyncService.getFileContent(filePath);
       const lines = content.split('\n');
       const uniqueLines = [...new Set(lines)];
       
@@ -1030,7 +1037,7 @@ class EnhancedTerminalShell {
     }
   }
 
-  private handleTabCompletion() {
+  private async handleTabCompletion() {
     const words = this.currentLine.split(' ');
     const currentWord = words[words.length - 1];
     
@@ -1052,7 +1059,7 @@ class EnhancedTerminalShell {
     } else {
       // Complete file/directory names
       try {
-        const items = vfsSyncService.listDir(this.currentDirectory);
+        const items = await vfsSyncService.listDir(this.currentDirectory);
         const matches = items.filter((item: any) => item.name.startsWith(currentWord));
         
         if (matches.length === 1) {

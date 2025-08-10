@@ -3,12 +3,11 @@ import MacDock from './components/MacDock';
 import Desktop from './components/Desktop';
 import Window from './components/Window';
 import TaskBar from './components/TaskBar';
+import LoginScreen from './components/LoginScreen';
 import { useWindowManager } from './hooks/useWindowManager';
-import { VFSDemo } from './filesystem/vfsDemo';
-import runVFSValidation from './filesystem/vfsValidation';
-import { vfsManager } from './filesystem/vfsManager';
+import useAuthStore from './stores/authStore';
 import { WallpaperManager, ThemeManager } from './utils/wallpaperManager';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
   const { 
@@ -19,33 +18,21 @@ function App() {
     toggleFullscreen
   } = useWindowManager();
 
-  // Debug logging
-  console.log('🖼️ Windows currently open:', windows.length, windows);    
+  const { initialize, isAuthenticated, isLoading } = useAuthStore();
+  const [authChecked, setAuthChecked] = useState(false);
   
-  // Initialize VFS demo and validation when app loads
+  // Initialize authentication state
   useEffect(() => {
-    console.log('🔧 Initializing Weave OS Virtual File System...');
-    
-    // Run basic demo
-    VFSDemo.runDemo();
-    
-    // Run comprehensive validation
-    console.log('\n🧪 Running VFS Validation Tests...');
-    setTimeout(() => {
-      runVFSValidation();
-    }, 1000);
-    
-    // Run enhanced CRUD demo
-    console.log('\n🎬 Running Enhanced CRUD Operations Demo...');
-    setTimeout(() => {
-      vfsManager.runCRUDDemo();
-      vfsManager.runTerminalIntegrationDemo();
-    }, 2000);
-  }, []);
-
-  // Initialize wallpaper and theme system
+    const initAuth = async () => {
+      await initialize();
+      setAuthChecked(true);
+    };
+    initAuth();
+  }, [initialize]);    
+  
+  // Initialize wallpaper and theme system (only after authentication)
   useEffect(() => {
-    console.log('🌅 Initializing wallpaper and theme system...');
+    if (!isAuthenticated) return;
     
     // Initialize theme and wallpaper managers
     const themeManager = ThemeManager.getInstance();
@@ -54,28 +41,41 @@ function App() {
     themeManager.initializeFromStorage();
     wallpaperManager.initializeFromStorage();
     
-    // Set default to live wallpaper if no preference exists
+    // Set default wallpaper if no preference exists
     const existingWallpaper = localStorage.getItem('weave-wallpaper');
     if (!existingWallpaper) {
-      localStorage.setItem('weave-wallpaper', 'live');
-      wallpaperManager.setWallpaper('live');
-      console.log('🌅 Set default wallpaper to live wallpaper');
+      localStorage.setItem('weave-wallpaper', 'default');
+      wallpaperManager.setWallpaper('default');
     }
-
-    // Note: Time-based wallpaper is disabled when using live wallpaper to avoid conflicts
-    console.log('🖼️ Wallpaper system initialized');
-  }, []);
+  }, [isAuthenticated]);
 
   const handleCreateFile = () => {
     // TODO: Implement file creation
-    console.log('Creating new file...');
   };
 
   const handleCreateFolder = () => {
     // TODO: Implement folder creation
-    console.log('Creating new folder...');
   };
 
+  const handleAuthenticated = () => {
+    // Authentication successful
+  };
+
+  // Show loading screen while checking authentication
+  if (!authChecked || isLoading) {
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-purple-700 to-orange-500 flex items-center justify-center">
+        <div className="text-white text-2xl font-light">Loading Weave OS...</div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen onAuthenticated={handleAuthenticated} />;
+  }
+
+  // Show desktop if authenticated
   return (
     <div className="app">
       {/* Main Desktop Environment */}
@@ -84,19 +84,7 @@ function App() {
         <div className="h-full"></div>
 
         {/* Render all open windows */}
-        {windows.map((window, index) => {
-          console.log(`🖼️ Rendering window ${index}:`, {
-            id: window.id,
-            title: window.title,
-            top: window.top,
-            left: window.left,
-            width: window.width,
-            height: window.height,
-            zIndex: window.zIndex,
-            isMinimized: window.isMinimized,
-            isFullscreen: window.isFullscreen
-          });
-          
+        {windows.map((window) => {
           return (
             <Window
               key={window.id}

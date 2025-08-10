@@ -1,15 +1,9 @@
 // Wallpaper management utility
 export class WallpaperManager {
   private static instance: WallpaperManager;
-  private currentWallpaper: string = 'gradient-blue';
+  private currentWallpaper: string = 'default';
   private liveWallpaperInterval: NodeJS.Timeout | null = null;
-  private liveWallpapers = [
-    '/images/day1.jpg',
-    '/images/evening.jpg', 
-    '/images/night1.jpg',
-    '/images/night2.jpg',
-    '/images/sunnyday.jpg'
-  ];
+  private liveWallpapers: string[] = [];
   private currentImageIndex: number = 0;
 
   private constructor() {}
@@ -24,7 +18,6 @@ export class WallpaperManager {
   }
 
   public setWallpaper(wallpaperId: string): void {
-    console.log(`🖼️ Setting wallpaper to: ${wallpaperId}`);
     this.currentWallpaper = wallpaperId;
     
     // Clear any existing wallpaper first
@@ -44,10 +37,9 @@ export class WallpaperManager {
       this.applyStaticWallpaper(wallpaperId);
     }
     
-    // Store preference with timestamp for debugging
+    // Store preference
     localStorage.setItem('weave-wallpaper', wallpaperId);
     localStorage.setItem('weave-wallpaper-timestamp', Date.now().toString());
-    console.log(`✅ Wallpaper ${wallpaperId} applied and saved to localStorage`);
   }
 
   public setCustomWallpaper(imageUrl: string): void {
@@ -186,26 +178,13 @@ export class WallpaperManager {
     // Remove any existing wallpaper elements
     this.clearWallpaperElements();
     
-    // Apply gradient wallpaper to body
-    const wallpaperClasses = {
-      'gradient-blue': 'from-blue-600 to-purple-700',
-      'gradient-sunset': 'from-orange-400 to-red-600', 
-      'gradient-forest': 'from-green-600 to-teal-700',
-      'gradient-space': 'from-purple-900 to-black'
-    };
-
-    const gradientClass = wallpaperClasses[wallpaperId as keyof typeof wallpaperClasses];
-    if (gradientClass) {
-      // Remove existing gradient classes
-      document.body.className = document.body.className
-        .replace(/bg-gradient-to-br/g, '')
-        .replace(/from-\w+-\d+/g, '')
-        .replace(/to-\w+-\d+/g, '')
-        .trim();
-      
-      // Add new gradient classes
-      document.body.classList.add('bg-gradient-to-br', ...gradientClass.split(' '));
-      console.log(`🖼️ Applied ${wallpaperId} wallpaper`);
+    if (wallpaperId === 'default') {
+      // Apply default wallpaper image
+      this.setCustomWallpaper('/images/default.jpg');
+      console.log('🖼️ Applied default wallpaper');
+    } else {
+      console.log(`⚠️ Unknown wallpaper ID: ${wallpaperId}, falling back to default`);
+      this.setCustomWallpaper('/images/default.jpg');
     }
   }
 
@@ -229,7 +208,7 @@ export class WallpaperManager {
     // Clear wallpaper elements
     this.clearWallpaperElements();
     
-    // Clear gradient classes from body
+    // Clear all background-related classes from body
     document.body.className = document.body.className
       .replace(/bg-gradient-to-br/g, '')
       .replace(/from-\w+-\d+/g, '')
@@ -237,14 +216,14 @@ export class WallpaperManager {
       .replace(/live-wallpaper-active/g, '')
       .trim();
     
-    // Clear background styles from body only
+    // Clear background styles from body
     document.body.style.backgroundImage = '';
     document.body.style.backgroundSize = '';
     document.body.style.backgroundPosition = '';
     document.body.style.backgroundRepeat = '';
     document.body.style.backgroundAttachment = '';
     
-    console.log('🧹 Background cleared from body only');
+    console.log('🧹 All backgrounds cleared');
   }
 
   public getCurrentWallpaper(): string {
@@ -266,9 +245,9 @@ export class WallpaperManager {
         this.setWallpaper(savedWallpaper);
       }, 100);
     } else {
-      // Default to live wallpaper
+      // Default to default wallpaper
       setTimeout(() => {
-        this.setWallpaper('live');
+        this.setWallpaper('default');
       }, 100);
     }
   }

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { vfsSyncService } from '../filesystem/vfsSyncService';
-import type { VFSNode } from '../filesystem/vfs';
+import { vfsSyncService, type VFSNode } from '../services/vfsSyncService';
 import { useWindowStore } from '../store/windowStore';
 import { useTheme, getThemeClasses } from '../hooks/useTheme';
 
@@ -136,7 +135,6 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
   const { updateWindowState, windows } = useWindowStore();
   const { isLight } = useTheme();
   const theme = getThemeClasses(isLight);
-  
   // Find current window state
   const currentWindow = windows.find(w => w.id === windowId);
   const filesState = currentWindow?.savedState?.customData?.files as any;
@@ -176,11 +174,11 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
     }
   }, [windowId, currentPath, selectedItems, viewMode, sortBy, sortOrder, searchQuery, showHidden, pathHistory, historyIndex, updateWindowState]);
 
-  // Load directory contents
+  // Load directory contents using VFS service
   const loadDirectory = useCallback(async (path: string) => {
     setIsLoading(true);
     try {
-      const items = vfsSyncService.listDir(path);
+      const items = await vfsSyncService.listDir(path);
       
       // Filter hidden files if not showing them
       let filteredItems = showHidden ? items : items.filter(item => !item.name.startsWith('.'));
@@ -212,8 +210,8 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
             comparison = aExt.localeCompare(bExt);
             break;
           case 'modified':
-            const aDate = a.lastModified || new Date(0);
-            const bDate = b.lastModified || new Date(0);
+            const aDate = a.modified || new Date(0);
+            const bDate = b.modified || new Date(0);
             comparison = aDate.getTime() - bDate.getTime();
             break;
         }
@@ -223,7 +221,9 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
       
       setCurrentItems(filteredItems);
       setSelectedItems(new Set());
+      
     } catch (error) {
+      console.error('❌ Failed to load directory:', error);
       showNotification('Failed to load directory', 'error');
       setCurrentItems([]);
     } finally {
@@ -266,10 +266,10 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
     }
   };
 
-  // Navigate up
+  // Navigate up (to parent folder)
   const navigateUp = () => {
-    const parentPath = currentPath === '/' ? '/' : currentPath.split('/').slice(0, -1).join('/') || '/';
-    if (parentPath !== currentPath) {
+    if (currentPath !== '/') {
+      const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/')) || '/';
       navigateToPath(parentPath);
     }
   };
@@ -286,11 +286,14 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
       const newPath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
       navigateToPath(newPath);
     } else if (isTextEditable(item.name) && onOpenFile) {
+      const filePath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
       try {
-        const filePath = currentPath === '/' ? `/${item.name}` : `${currentPath}/${item.name}`;
-        const content = vfsSyncService.getFileContent(filePath);
-        onOpenFile(item.name, filePath, content);
-        showNotification(`Opened ${item.name}`, 'success');
+        // Use VFS service to get file content
+        vfsSyncService.getFileContent(filePath).then(content => {
+          onOpenFile(item.name, filePath, content);
+        }).catch(() => {
+          showNotification(`Failed to open ${item.name}`, 'error');
+        });
       } catch (error) {
         showNotification(`Failed to open ${item.name}`, 'error');
       }
@@ -330,10 +333,11 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
     if (name) {
       try {
         const folderPath = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`;
-        vfsSyncService.createFolder(folderPath);
+        await vfsSyncService.createFolder(folderPath);
         showNotification(`Created folder: ${name}`, 'success');
         loadDirectory(currentPath);
       } catch (error) {
+        console.error('Failed to create folder:', error);
         showNotification(`Failed to create folder: ${name}`, 'error');
       }
     }
@@ -346,10 +350,11 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
     if (name) {
       try {
         const filePath = currentPath === '/' ? `/${name}` : `${currentPath}/${name}`;
-        vfsSyncService.createFile(filePath, '');
+        await vfsSyncService.createFile(filePath, '');
         showNotification(`Created file: ${name}`, 'success');
         loadDirectory(currentPath);
       } catch (error) {
+        console.error('Failed to create file:', error);
         showNotification(`Failed to create file: ${name}`, 'error');
       }
     }
@@ -368,7 +373,7 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
       for (const itemName of itemNames) {
         try {
           const itemPath = currentPath === '/' ? `/${itemName}` : `${currentPath}/${itemName}`;
-          vfsSyncService.deleteNode(itemPath);
+          await vfsSyncService.deleteNode(itemPath);
           successCount++;
         } catch (error) {
           console.error(`Failed to delete ${itemName}:`, error);
@@ -396,10 +401,45 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
     return breadcrumbs;
   };
 
+  // Handle file upload
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsLoading(true);
+    let successCount = 0;
+
+    try {
+      for (const file of Array.from(files)) {
+        try {
+          const fileName = file.name;
+          const filePath = currentPath === '/' ? `/${fileName}` : `${currentPath}/${fileName}`;
+          
+          // Read file content and create via VFS
+          const content = await file.text();
+          await vfsSyncService.createFile(filePath, content);
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to upload ${file.name}:`, error);
+        }
+      }
+
+      showNotification(`Uploaded ${successCount} file(s)`, 'success');
+      loadDirectory(currentPath);
+    } catch (error) {
+      console.error('Upload error:', error);
+      showNotification('Failed to upload files', 'error');
+    } finally {
+      setIsLoading(false);
+      // Reset the input
+      event.target.value = '';
+    }
+  };
+
   // Load initial directory
   useEffect(() => {
     loadDirectory(currentPath);
-  }, [loadDirectory]);
+  }, [loadDirectory, currentPath]);
 
   // Close context menu on click outside
   useEffect(() => {
@@ -518,7 +558,7 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
               {QUICK_ACCESS.map(item => (
                 <button
                   key={item.path}
-                  onClick={() => navigateToPath(item.path)}
+                  onClick={() => navigateToPath(item.path)} // Navigate to the quick access path
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
                     currentPath === item.path
                       ? `${item.color} border border-current`
@@ -535,6 +575,18 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
           {/* File Operations */}
           <div className="p-4 border-t border-theme-border mt-auto">
             <div className="space-y-2">
+              {/* File Upload */}
+              <label className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-tertiary transition-all cursor-pointer">
+                <span>📤</span>
+                <span className="text-sm">Upload Files</span>
+                <input
+                  type="file"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </label>
+              
               <button
                 onClick={createNewFolder}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-theme-text-secondary hover:text-theme-text-primary hover:bg-theme-bg-tertiary transition-all"
@@ -708,10 +760,13 @@ const FilesEnhanced = ({ onOpenFile, windowId }: FilesProps) => {
                   } else if (contextMenu.item && isTextEditable(contextMenu.item.name) && onOpenFile) {
                     const filePath = currentPath === '/' ? `/${contextMenu.item.name}` : `${currentPath}/${contextMenu.item.name}`;
                     try {
-                      const content = vfsSyncService.getFileContent(filePath);
-                      onOpenFile(contextMenu.item.name, filePath, content);
+                      vfsSyncService.getFileContent(filePath).then(content => {
+                        onOpenFile(contextMenu.item!.name, filePath, content);
+                      }).catch(() => {
+                        showNotification(`Failed to open ${contextMenu.item!.name}`, 'error');
+                      });
                     } catch (error) {
-                      showNotification(`Failed to open ${contextMenu.item.name}`, 'error');
+                      showNotification(`Failed to open ${contextMenu.item!.name}`, 'error');
                     }
                   }
                   setContextMenu(null);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { vfsSyncService } from '../filesystem/vfsSyncService';
+import { vfsSyncService } from '../services/vfsSyncService';
 import { useWindowStore } from '../store/windowStore';
 import { useTheme, getThemeClasses } from '../hooks/useTheme';
 

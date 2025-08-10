@@ -94,7 +94,7 @@ const Desktop: React.FC<DesktopProps> = ({ children, onCreateFile, onCreateFolde
       icon: '🖼️',
       action: () => {
         // Cycle through wallpapers using WallpaperManager
-        const wallpapers = ['gradient-blue', 'gradient-sunset', 'gradient-forest', 'gradient-space', 'live'];
+        const wallpapers = ['default', 'live'];
         const currentWallpaper = wallpaperManager.getCurrentWallpaper();
         const currentIndex = wallpapers.indexOf(currentWallpaper);
         const nextWallpaper = wallpapers[(currentIndex + 1) % wallpapers.length];
@@ -103,10 +103,7 @@ const Desktop: React.FC<DesktopProps> = ({ children, onCreateFile, onCreateFolde
         
         // Show notification
         const wallpaperNames = {
-          'gradient-blue': 'Blue Gradient',
-          'gradient-sunset': 'Sunset Gradient', 
-          'gradient-forest': 'Forest Gradient',
-          'gradient-space': 'Space Gradient',
+          'default': 'Default Wallpaper',
           'live': 'Live Wallpaper'
         };
         

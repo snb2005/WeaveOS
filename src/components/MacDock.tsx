@@ -78,11 +78,6 @@ const MacDock: React.FC = () => {
   ];
 
   const handleAppClick = (appId: string) => {
-    console.log(`🎯 Dock click: ${appId}`, {
-      existingWindows: windows.filter((w: any) => w.app === appId),
-      totalWindows: windows.length
-    });
-    
     // Apps that support multiple instances
     const multiInstanceApps = ['Terminal', 'Files', 'TextEditor'];
     const supportsMultiple = multiInstanceApps.includes(appId);
@@ -94,8 +89,6 @@ const MacDock: React.FC = () => {
     if (appWindows.length === 0) {
       // No windows exist, create new one
       const appConfig = getAppConfig(appId);
-      
-      console.log(`📱 Opening new window for ${appId}:`, appConfig);
       
       if (appConfig) {
         const windowId = openWindow(appId, {
@@ -115,8 +108,6 @@ const MacDock: React.FC = () => {
     } else if (supportsMultiple) {
       // For multi-instance apps, always create a new window
       const appConfig = getAppConfig(appId);
-      
-      console.log(`📱 Opening additional window for ${appId}:`, appConfig);
       
       if (appConfig) {
         const windowId = openWindow(appId, {
@@ -140,14 +131,12 @@ const MacDock: React.FC = () => {
         const mostRecentWindow = visibleAppWindows.reduce((latest, current) => 
           (current.zIndex || 0) > (latest.zIndex || 0) ? current : latest
         );
-        console.log(`🔍 Focusing existing window:`, mostRecentWindow.id);
         focusWindow(mostRecentWindow.id);
       } else {
         // All windows are minimized, restore the most recent one
         const mostRecentWindow = appWindows.reduce((latest, current) => 
           (current.zIndex || 0) > (latest.zIndex || 0) ? current : latest
         );
-        console.log(`📤 Restoring minimized window:`, mostRecentWindow.id);
         focusWindow(mostRecentWindow.id); // This should also unminimize
       }
     }
