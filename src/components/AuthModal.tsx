@@ -81,183 +81,231 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center">
-      {/* Backdrop */}
+      {/* Professional backdrop */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-md"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative w-full max-w-md mx-4 bg-theme-secondary/90 backdrop-blur-xl rounded-2xl border border-theme-glass shadow-2xl">
+      {/* Professional Modal */}
+      <div className="relative w-full max-w-md mx-4 bg-gray-900/95 backdrop-blur-xl rounded-xl border border-gray-700/50 shadow-2xl">
         {/* Header */}
-        <div className="p-6 pb-4">
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-blue-500/20 rounded-full">
-              {isLogin ? (
-                <LogIn className="w-6 h-6 text-blue-400" />
-              ) : (
-                <UserPlus className="w-6 h-6 text-blue-400" />
-              )}
+        <div className="p-6 pb-4 border-b border-gray-700/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-lg">
+                {isLogin ? (
+                  <LogIn className="w-5 h-5 text-white" />
+                ) : (
+                  <UserPlus className="w-5 h-5 text-white" />
+                )}
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">
+                  {isLogin ? 'Welcome Back' : 'Create Account'}
+                </h2>
+                <p className="text-gray-400 text-sm">
+                  {isLogin 
+                    ? 'Sign in to your workspace'
+                    : 'Join the Weave OS platform'
+                  }
+                </p>
+              </div>
             </div>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-200 hover:bg-gray-800 rounded-lg transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <h2 className="text-2xl font-semibold text-center text-theme-primary mb-2">
-            {isLogin ? 'Welcome Back' : 'Join Weave OS'}
-          </h2>
-          <p className="text-theme-secondary text-center text-sm">
-            {isLogin 
-              ? 'Sign in to access your workspace'
-              : 'Create your account to get started'
-            }
-          </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="px-6 pb-6">
+        <form onSubmit={handleSubmit} className="p-6">
           {/* Error Alert */}
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
-              <span className="text-red-400 text-sm">{error}</span>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start space-x-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-red-400 text-sm font-medium">Authentication Error</p>
+                <p className="text-red-300 text-sm mt-1">{error}</p>
+              </div>
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {/* First Name & Last Name (Registration only) */}
             {!isLogin && (
               <div className="grid grid-cols-2 gap-3">
-                <div className="relative">
-                  <User className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
-                  <input
-                    type="text"
-                    name="firstName"
-                    placeholder="First Name"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    required={!isLogin}
-                    className="w-full pl-10 pr-4 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                             text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
-                             focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                  />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    First Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      name="firstName"
+                      placeholder="First name"
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      required={!isLogin}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                               text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                               focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    />
+                  </div>
                 </div>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
-                  <input
-                    type="text"
-                    name="lastName"
-                    placeholder="Last Name"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    required={!isLogin}
-                    className="w-full pl-10 pr-4 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                             text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
-                             focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                  />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      name="lastName"
+                      placeholder="Last name"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required={!isLogin}
+                      className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                               text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                               focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Email */}
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
-              <input
-                type="email"
-                name="email"
-                placeholder={isLogin ? "Email Address" : "Email Address"}
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-4 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                         text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
-                         focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-              />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                           focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                />
+              </div>
             </div>
 
             {/* Username (Registration only) */}
             {!isLogin && (
-              <div className="relative">
-                <User className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  required={!isLogin}
-                  className="w-full pl-10 pr-4 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                           text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
-                           focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-                />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  Username
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="username"
+                    placeholder="Choose a username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required={!isLogin}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                             text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                             focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                </div>
               </div>
             )}
 
             {/* Password */}
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-12 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                         text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
-                         focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-theme-muted hover:text-theme-secondary transition-colors"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-
-            {/* Confirm Password (Registration only) */}
-            {!isLogin && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 w-4 h-4 text-theme-muted" />
+                <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
                   onChange={handleInputChange}
-                  required={!isLogin}
-                  className="w-full pl-10 pr-12 py-3 bg-theme-tertiary/50 border border-theme-glass rounded-lg 
-                           text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 
+                  required
+                  className="w-full pl-10 pr-12 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                           text-white placeholder-gray-400 focus:outline-none focus:ring-2 
                            focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-3 text-theme-muted hover:text-theme-secondary transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-200 transition-colors"
                 >
-                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
+              </div>
+            </div>
+
+            {/* Confirm Password (Registration only) */}
+            {!isLogin && (
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    required={!isLogin}
+                    className="w-full pl-10 pr-12 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg 
+                             text-white placeholder-gray-400 focus:outline-none focus:ring-2 
+                             focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-200 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
             )}
 
             {/* Password Validation (Registration only) */}
             {!isLogin && formData.password && (
-              <div className="space-y-1">
-                <div className={`text-xs flex items-center gap-2 ${
-                  formData.password.length >= 8 ? 'text-green-400' : 'text-theme-muted'
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    formData.password.length >= 8 ? 'bg-green-400' : 'bg-theme-muted'
-                  }`} />
-                  At least 8 characters
-                </div>
-                <div className={`text-xs flex items-center gap-2 ${
-                  formData.confirmPassword && formData.password === formData.confirmPassword 
-                    ? 'text-green-400' : 'text-theme-muted'
-                }`}>
-                  <div className={`w-1.5 h-1.5 rounded-full ${
+              <div className="bg-gray-800/50 rounded-lg p-3 space-y-2">
+                <p className="text-gray-300 text-sm font-medium">Password Requirements:</p>
+                <div className="space-y-1">
+                  <div className={`text-xs flex items-center gap-2 ${
+                    formData.password.length >= 8 ? 'text-green-400' : 'text-gray-400'
+                  }`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${
+                      formData.password.length >= 8 ? 'bg-green-400' : 'bg-gray-400'
+                    }`} />
+                    At least 8 characters
+                  </div>
+                  <div className={`text-xs flex items-center gap-2 ${
                     formData.confirmPassword && formData.password === formData.confirmPassword 
-                      ? 'bg-green-400' : 'bg-theme-muted'
-                  }`} />
-                  Passwords match
+                      ? 'text-green-400' : 'text-gray-400'
+                  }`}>
+                    <div className={`w-1.5 h-1.5 rounded-full ${
+                      formData.confirmPassword && formData.password === formData.confirmPassword 
+                        ? 'bg-green-400' : 'bg-gray-400'
+                    }`} />
+                    Passwords match
+                  </div>
                 </div>
               </div>
             )}
@@ -267,9 +315,9 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
           <button
             type="submit"
             disabled={isLoading || (!isLogin && formData.password !== formData.confirmPassword)}
-            className="w-full mt-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 
-                     disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all 
-                     duration-200 flex items-center justify-center gap-2"
+            className="w-full mt-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 
+                     disabled:from-gray-600 disabled:to-gray-700 disabled:cursor-not-allowed text-white font-semibold 
+                     rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
           >
             {isLoading ? (
               <>
@@ -286,15 +334,15 @@ const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
           {/* Switch Mode */}
           <div className="mt-6 text-center">
-            <span className="text-theme-secondary text-sm">
+            <span className="text-gray-400 text-sm">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
             </span>
             <button
               type="button"
               onClick={switchMode}
-              className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+              className="text-blue-400 hover:text-blue-300 text-sm font-semibold transition-colors"
             >
-              {isLogin ? 'Sign up' : 'Sign in'}
+              {isLogin ? 'Create Account' : 'Sign In'}
             </button>
           </div>
         </form>

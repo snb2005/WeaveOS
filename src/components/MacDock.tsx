@@ -10,6 +10,7 @@ import Settings from '../apps/Settings';
 import TextEditor from '../apps/TextEditor';
 import Browser from '../apps/Browser';
 import IconDemoApp from '../apps/IconDemoApp';
+import CodeEditor from '../apps/CodeEditor';
 
 interface DockItem {
   id: string;
@@ -26,14 +27,14 @@ const createAppComponent = (appName: string, windowId?: string, props?: any) => 
         windowId={windowId}
         onOpenFile={(fileName: string, filePath: string, content: string) => {
           const { openWindow } = useWindowStore.getState();
-          const appConfig = getAppConfig('TextEditor');
+          const appConfig = getAppConfig('CodeEditor');
           
           if (appConfig) {
-            openWindow(`TextEditor-${filePath}`, {
+            openWindow(`CodeEditor-${filePath}`, {
               title: `${appConfig.name} - ${fileName}`,
-              content: <TextEditor filePath={filePath} initialContent={content} fileName={fileName} windowId={`TextEditor-${filePath}`} />,
-              width: appConfig.width || 800,
-              height: appConfig.height || 600,
+              content: <CodeEditor filePath={filePath} initialContent={content} fileName={fileName} />,
+              width: appConfig.width || 1200,
+              height: appConfig.height || 800,
               top: 120 + Math.random() * 100,
               left: 120 + Math.random() * 100,
             });
@@ -46,6 +47,8 @@ const createAppComponent = (appName: string, windowId?: string, props?: any) => 
       return <Calculator {...props} windowId={windowId} />;
     case 'Settings':
       return <Settings {...props} windowId={windowId} />;
+    case 'CodeEditor':
+      return <CodeEditor {...props} windowId={windowId} />;
     case 'TextEditor':
       return <TextEditor {...props} windowId={windowId} />;
     case 'Text Editor':
@@ -69,17 +72,16 @@ const MacDock: React.FC = () => {
   const dockItems: DockItem[] = [
     { id: 'Files', name: 'Files', icon: 'file-manager' },
     { id: 'Terminal', name: 'Terminal', icon: 'terminal' },
-    { id: 'TextEditor', name: 'Text Editor', icon: 'file' },
+    { id: 'CodeEditor', name: 'Code Editor', icon: 'file' },
     { id: 'Calculator', name: 'Calculator', icon: 'calculator' },
     { id: 'Browser', name: 'Browser', icon: 'browser' },
     { id: 'Settings', name: 'Settings', icon: 'settings' },
     { id: 'IconDemo', name: 'Icon Gallery', icon: 'palette' },
-    { id: 'Media Player', name: 'Media Player', icon: 'media-player' },
   ];
 
   const handleAppClick = (appId: string) => {
     // Apps that support multiple instances
-    const multiInstanceApps = ['Terminal', 'Files', 'TextEditor'];
+    const multiInstanceApps = ['Terminal', 'Files', 'TextEditor', 'CodeEditor'];
     const supportsMultiple = multiInstanceApps.includes(appId);
     
     // Find all windows for this app (including minimized for single-instance apps)
@@ -270,7 +272,7 @@ const MacDock: React.FC = () => {
                   onContextMenu={(e) => {
                     e.preventDefault();
                     // Right-click always creates a new instance for multi-instance apps
-                    const multiInstanceApps = ['Terminal', 'Files', 'TextEditor'];
+                    const multiInstanceApps = ['Terminal', 'Files', 'TextEditor', 'CodeEditor'];
                     if (multiInstanceApps.includes(item.id)) {
                       const appConfig = getAppConfig(item.id);
                       if (appConfig) {
@@ -310,7 +312,7 @@ const MacDock: React.FC = () => {
                 {isRunning && (
                   <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
                     {(() => {
-                      const multiInstanceApps = ['Terminal', 'Files', 'TextEditor'];
+                      const multiInstanceApps = ['Terminal', 'Files', 'TextEditor', 'CodeEditor'];
                       const isMultiInstance = multiInstanceApps.includes(item.id);
                       const instanceCount = windows.filter((w: any) => w.app === item.id && w.isVisible).length;
                       
@@ -338,7 +340,7 @@ const MacDock: React.FC = () => {
                     bg-gray-900 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none z-10
                     animate-in fade-in-0 zoom-in-95 duration-200">
                     {(() => {
-                      const multiInstanceApps = ['Terminal', 'Files', 'TextEditor'];
+                      const multiInstanceApps = ['Terminal', 'Files', 'TextEditor', 'CodeEditor'];
                       const isMultiInstance = multiInstanceApps.includes(item.id);
                       const instanceCount = windows.filter((w: any) => w.app === item.id && w.isVisible).length;
                       

@@ -182,197 +182,247 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Ubuntu-style gradient background */}
+      {/* Professional dark gradient background */}
       <div 
-        className="absolute inset-0 bg-gradient-to-br from-purple-900 via-purple-700 to-orange-500"
+        className="absolute inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900"
         style={{
-          background: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 25%, #a855f7 50%, #d946ef 75%, #f97316 100%)'
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #374151 50%, #4b5563 75%, #374151 100%)'
         }}
       />
       
-      {/* Overlay pattern */}
-      <div className="absolute inset-0 bg-black/20" />
+      {/* Subtle geometric pattern overlay */}
+      <div className="absolute inset-0 opacity-5">
+        <div 
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }}
+        />
+      </div>
       
-      {/* Time and Date Display */}
-      <div className="absolute top-8 left-8 text-white">
-        <div className="text-6xl font-light mb-2">
+      {/* Time and Date Display - Professional styling */}
+      <div className="absolute top-8 left-8 text-gray-100">
+        <div className="text-5xl font-extralight mb-1 tracking-tight">
           {formatTime(currentTime)}
         </div>
-        <div className="text-xl opacity-80">
+        <div className="text-lg text-gray-300 font-light">
           {formatDate(currentTime)}
         </div>
       </div>
 
-      {/* Weave OS Logo/Title */}
-      <div className="absolute top-8 right-8 text-white text-right">
-        <div className="text-3xl font-bold mb-1">Weave OS</div>
-        <div className="text-lg opacity-80">Browser Operating System</div>
+      {/* Weave OS Branding - Professional layout */}
+      <div className="absolute top-8 right-8 text-right">
+        <div className="text-2xl font-bold text-white mb-1 tracking-wide">WEAVE OS</div>
+        <div className="text-sm text-gray-300 font-medium tracking-wider uppercase">
+          Enterprise Operating System
+        </div>
       </div>
 
-      {/* Login/Register Card */}
-      <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl">
-        {/* Ubuntu-style user avatar */}
-        <div className="flex justify-center mb-6">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/30">
-            <User size={40} className="text-white" />
+      {/* Professional Login/Register Card */}
+      <div className="relative bg-gray-900/90 backdrop-blur-xl border border-gray-700/50 rounded-xl p-8 w-full max-w-md mx-4 shadow-2xl">
+        {/* Minimalist header */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <User size={28} className="text-white" />
           </div>
+          <h1 className="text-2xl font-bold text-white mb-2">Welcome</h1>
+          <p className="text-gray-400 text-sm">
+            {isLogin ? 'Sign in to your workspace' : 'Create your account'}
+          </p>
         </div>
 
-        {/* Toggle between Login and Register */}
-        <div className="flex bg-white/10 rounded-lg p-1 mb-6">
+        {/* Sleek Toggle Buttons */}
+        <div className="flex bg-gray-800/80 rounded-lg p-1 mb-8">
           <button
             onClick={() => setIsLogin(true)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-all duration-300 ${
               isLogin 
-                ? 'bg-white text-purple-900 shadow-lg' 
-                : 'text-white hover:bg-white/10'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25' 
+                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
             }`}
           >
             Sign In
           </button>
           <button
             onClick={() => setIsLogin(false)}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 py-3 px-4 rounded-md text-sm font-semibold transition-all duration-300 ${
               !isLogin 
-                ? 'bg-white text-purple-900 shadow-lg' 
-                : 'text-white hover:bg-white/10'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25' 
+                : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/50'
             }`}
           >
             Register
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Professional Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Field */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail size={18} className="text-white/60" />
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail size={18} className="text-gray-400" />
+              </div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+              />
             </div>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email address"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-            />
           </div>
 
           {/* Username Field (Register only) */}
           {!isLogin && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User size={18} className="text-white/60" />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Username
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User size={18} className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Choose a username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                />
               </div>
-              <input
-                type="text"
-                name="username"
-                placeholder="Username"
-                value={formData.username}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-              />
             </div>
           )}
 
-          {/* First Name Field (Register only) */}
+          {/* First & Last Name Fields (Register only) */}
           {!isLogin && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User size={18} className="text-white/60" />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  First Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="First name"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-              />
-            </div>
-          )}
-
-          {/* Last Name Field (Register only) */}
-          {!isLogin && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User size={18} className="text-white/60" />
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Last Name
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User size={18} className="text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full pl-10 pr-4 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name (Optional)"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-              />
             </div>
           )}
 
           {/* Password Field */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock size={18} className="text-white/60" />
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock size={18} className="text-gray-400" />
+              </div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-12 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 transition-colors"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white/80"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
           </div>
 
           {/* Confirm Password Field (Register only) */}
           {!isLogin && (
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock size={18} className="text-white/60" />
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock size={18} className="text-gray-400" />
+                </div>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pl-10 pr-12 py-3 bg-gray-800/60 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/60 hover:text-white/80"
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
             </div>
           )}
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-red-200 text-sm">
-              {error}
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">!</span>
+                </div>
+              </div>
+              <div>
+                <p className="text-red-400 text-sm font-medium">Authentication Error</p>
+                <p className="text-red-300 text-sm mt-1">{error}</p>
+              </div>
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Professional Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-white/20 hover:bg-white/30 disabled:bg-white/10 border border-white/30 text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
           >
             {isLoading ? (
               <>
@@ -385,48 +435,27 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
           </button>
         </form>
 
-        {/* Additional Info */}
-        <div className="mt-6 text-center text-white/60 text-sm">
+        {/* Professional Footer */}
+        <div className="mt-8 text-center text-gray-400 text-sm">
           {isLogin ? (
-            <p>New to Weave OS? Click Register above to create an account.</p>
+            <p>New to Weave OS? <span className="text-blue-400 font-medium">Register above</span> to create an account.</p>
           ) : (
-            <p>Already have an account? Click Sign In above to login.</p>
+            <p>Already have an account? <span className="text-blue-400 font-medium">Sign In above</span> to continue.</p>
           )}
         </div>
-
-        {/* Debug Test Button */}
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                await login({
-                  email: 'test@weave.com',
-                  password: 'password123'
-                });
-                onAuthenticated();
-              } catch (error) {
-                console.error('❌ Test login failed:', error);
-              }
-            }}
-            className="text-white/40 hover:text-white/60 text-xs underline transition-colors"
-          >
-            Test Login (Debug)
-          </button>
-        </div>
       </div>
 
-      {/* System Info */}
-      <div className="absolute bottom-8 left-8 text-white/60 text-sm">
-        <div>Weave OS v1.0</div>
-        <div>Browser-based Operating System</div>
+      {/* Professional System Info */}
+      <div className="absolute bottom-8 left-8 text-gray-400 text-sm">
+        <div className="font-semibold">Weave OS v1.0</div>
+        <div className="text-gray-500">Enterprise Browser Platform</div>
       </div>
 
-      {/* Power options placeholder */}
-      <div className="absolute bottom-8 right-8 flex space-x-4 text-white/60">
-        <button className="hover:text-white transition-colors p-2">
-          <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center">
-            <div className="w-2 h-2 border-t border-current"></div>
+      {/* Minimalist Power Options */}
+      <div className="absolute bottom-8 right-8 flex space-x-4 text-gray-500">
+        <button className="hover:text-gray-300 transition-colors p-2 rounded-lg hover:bg-gray-800/30">
+          <div className="w-5 h-5 rounded-full border-2 border-current flex items-center justify-center">
+            <div className="w-1 h-1 bg-current rounded-full"></div>
           </div>
         </button>
       </div>

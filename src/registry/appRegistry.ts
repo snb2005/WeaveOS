@@ -71,14 +71,14 @@ export const APP_REGISTRY: Record<string, AppConfig> = {
     description: 'Text editor with syntax highlighting support',
   },
   
-  MediaPlayer: {
-    id: 'Media Player',
-    name: 'Media Player',
-    icon: '🎵',
-    allowMultiple: false,
-    width: 600,
-    height: 500,
-    description: 'Audio and video media player',
+  CodeEditor: {
+    id: 'CodeEditor',
+    name: 'Code Editor',
+    icon: '👨‍💻',
+    allowMultiple: true,
+    width: 1200,
+    height: 800,
+    description: 'Advanced code editor with Monaco, Vim mode, and Git integration',
   },
   
   IconDemo: {
@@ -113,10 +113,9 @@ export const getSingleInstanceApps = (): AppConfig[] => {
 export const DOCK_APPS = [
   'Terminal',
   'Files',
-  'Firefox',
-  'Text Editor',
+  'CodeEditor',
+  'Browser',
   'Calculator',
-  'Media Player',
   'Settings',
 ];
 
