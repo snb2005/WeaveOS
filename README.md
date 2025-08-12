@@ -296,9 +296,6 @@ server {
 
 ## 📄 Legal & Licensing
 
-### Open Source License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for complete terms.
-
 ### Third-Party Acknowledgments
 - **React Team** - Component framework and development tools
 - **MongoDB** - Database platform and GridFS storage system
