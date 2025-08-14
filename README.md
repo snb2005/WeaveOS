@@ -256,6 +256,8 @@ npm run build
 aws s3 sync dist/ s3://your-bucket-name
 ```
 
+**Note**: The application includes proper polyfills for Node.js modules and should deploy successfully on all major hosting platforms. The `netlify.toml` file is included for Netlify deployments with proper SPA routing configuration.
+
 ### Docker Deployment
 ```dockerfile
 # Dockerfile example
