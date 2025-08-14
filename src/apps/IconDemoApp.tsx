@@ -11,7 +11,7 @@ interface IconDemoAppProps {
  * This app showcases the Papirus icon theme integration and can be opened
  * from the dock to test icon functionality.
  */
-const IconDemoApp: React.FC<IconDemoAppProps> = ({ windowId }) => {
+const IconDemoApp: React.FC<IconDemoAppProps> = ({ windowId: _windowId }) => {
   return (
     <div className="h-full bg-theme-primary text-theme-primary overflow-auto">
       <div className="p-6">

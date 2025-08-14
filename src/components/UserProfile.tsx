@@ -41,7 +41,7 @@ const UserProfile = ({ isOpen, onClose }: UserProfileProps) => {
   const loadStorageInfo = async () => {
     try {
       const response = await apiClient.getUserStorage();
-      setStorageInfo(response.storage);
+      setStorageInfo((response as any).storage || response.data);
     } catch (error) {
       console.error('Failed to load storage info:', error);
     }
@@ -90,14 +90,6 @@ const UserProfile = ({ isOpen, onClose }: UserProfileProps) => {
   const handleLogout = async () => {
     await logout();
     onClose();
-  };
-
-  const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   if (!isOpen || !user) return null;

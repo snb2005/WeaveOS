@@ -2,7 +2,80 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import apiClient from '../services/apiClient';
 
-const useAuthStore = create(
+// Types
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+  role: string;
+  avatar?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  lastLogin?: Date;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  name?: string;
+  email: string;
+  password: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  confirmPassword?: string;
+}
+
+interface ProfileData {
+  name?: string;
+  email?: string;
+  avatar?: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+interface PasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword?: string;
+}
+
+// Extended API response interfaces
+interface UserApiResponse {
+  success: boolean;
+  user?: User;
+  data?: User;
+  storage?: any;
+  message?: string;
+}
+
+interface AuthState {
+  // State
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+
+  // Actions
+  login: (credentials: LoginCredentials) => Promise<any>;
+  register: (userData: RegisterData) => Promise<any>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<User | null>;
+  updateProfile: (profileData: ProfileData) => Promise<any>;
+  changePassword: (passwordData: PasswordData) => Promise<any>;
+  clearError: () => void;
+  initialize: () => Promise<void>;
+  hasPermission: (permission: string) => boolean;
+  isAdmin: () => boolean;
+}
+
+const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       // State
@@ -27,11 +100,12 @@ const useAuthStore = create(
           
           return response;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Login failed';
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message
+            error: errorMessage
           });
           throw error;
         }
@@ -52,11 +126,12 @@ const useAuthStore = create(
           
           return response;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed';
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: error.message
+            error: errorMessage
           });
           throw error;
         }
@@ -79,32 +154,34 @@ const useAuthStore = create(
         }
       },
 
-      refreshUser: async () => {
-        if (!get().isAuthenticated) return;
+      refreshUser: async (): Promise<User | null> => {
+        if (!get().isAuthenticated) return null;
         
         set({ isLoading: true });
         
         try {
-          const response = await apiClient.getCurrentUser();
+          const response = await apiClient.getCurrentUser() as UserApiResponse;
+          const user = response.user || response.data;
           
           set({
-            user: response.user,
+            user,
             isAuthenticated: true,
             isLoading: false,
             error: null
           });
           
-          return response.user;
+          return user ?? null;
         } catch (error) {
           console.error('Refresh user error:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to refresh user';
           
           // If token is invalid, logout
-          if (error.message.includes('401') || error.message.includes('unauthorized')) {
+          if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
             get().logout();
           } else {
             set({
               isLoading: false,
-              error: error.message
+              error: errorMessage
             });
           }
           
@@ -116,19 +193,22 @@ const useAuthStore = create(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await apiClient.updateUserProfile(profileData);
+          const response = await apiClient.updateUserProfile(profileData) as UserApiResponse;
+          const updatedUser = response.user || response.data;
+          const currentUser = get().user;
           
           set({
-            user: { ...get().user, ...response.user },
+            user: currentUser && updatedUser ? { ...currentUser, ...updatedUser } : updatedUser || currentUser,
             isLoading: false,
             error: null
           });
           
           return response;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
           set({
             isLoading: false,
-            error: error.message
+            error: errorMessage
           });
           throw error;
         }
@@ -147,9 +227,10 @@ const useAuthStore = create(
           
           return response;
         } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Failed to change password';
           set({
             isLoading: false,
-            error: error.message
+            error: errorMessage
           });
           throw error;
         }
@@ -183,7 +264,7 @@ const useAuthStore = create(
       },
 
       // Check if user has specific permission
-      hasPermission: (permission) => {
+      hasPermission: (permission: string) => {
         const user = get().user;
         if (!user) return false;
         
@@ -191,7 +272,17 @@ const useAuthStore = create(
         if (user.role === 'admin') return true;
         
         // Add more permission logic here as needed
-        return true;
+        // For now, we'll implement basic role-based permissions
+        switch (permission) {
+          case 'admin':
+            return user.role === 'admin';
+          case 'write':
+            return ['admin', 'editor', 'user'].includes(user.role);
+          case 'read':
+            return ['admin', 'editor', 'user', 'viewer'].includes(user.role);
+          default:
+            return false;
+        }
       },
 
       // Check if user is admin
