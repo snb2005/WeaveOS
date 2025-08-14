@@ -28,10 +28,12 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({
       <div className="text-center space-y-8">
         {/* Professional logo/branding */}
         <div className="space-y-4">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
-            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl overflow-hidden">
+            <img 
+              src="/images/logo.png" 
+              alt="Weave OS Logo" 
+              className="w-12 h-12 object-contain"
+            />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white tracking-wide">WEAVE OS</h1>

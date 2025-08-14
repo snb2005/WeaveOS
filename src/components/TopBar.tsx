@@ -244,7 +244,15 @@ const TopBar: React.FC<TopBarProps> = () => {
               onClick={(e) => { e.stopPropagation(); setShowAppleMenu(!showAppleMenu); }}
               show={showAppleMenu}
             >
-              🍎
+              <img 
+                src="/images/logo.png" 
+                alt="Weave OS" 
+                style={{ 
+                  width: '28px', 
+                  height: '28px', 
+                  objectFit: 'contain' 
+                }} 
+              />
             </MenuButton>
             
             {showAppleMenu && (

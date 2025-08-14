@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, EyeOff, User, Lock, Mail, Loader } from 'lucide-react';
-import useAuthStore from '../stores/authStore.js';
+import { Eye, EyeOff, User, Mail, Lock, Loader2 } from 'lucide-react';
+import useAuthStore from '../stores/authStore';
 
 interface LoginScreenProps {
   onAuthenticated: () => void;
@@ -38,55 +38,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
       onAuthenticated();
     }
   }, [isAuthenticated, onAuthenticated]);
-
-  // Test API connectivity when component mounts
-  useEffect(() => {
-    const testApiConnectivity = async () => {
-      try {
-        await fetch('http://localhost:3001/health');
-        
-        // Test CORS with a simple auth endpoint
-        try {
-          await fetch('http://localhost:3001/api/auth/me', {
-            headers: {
-              'Authorization': 'Bearer invalid-token'
-            },
-            credentials: 'include'
-          });
-        } catch (corsError) {
-          // Expected to fail with auth error
-        }
-        
-      } catch (error) {
-        console.error('❌ API connectivity test failed:', error);
-        
-        // Show error message on screen
-        const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = `
-          position: fixed;
-          top: 20px;
-          left: 20px;
-          background: rgba(239, 68, 68, 0.9);
-          color: white;
-          padding: 16px;
-          border-radius: 8px;
-          max-width: 400px;
-          z-index: 1000;
-          font-family: system-ui, -apple-system, sans-serif;
-        `;
-        errorDiv.textContent = `Cannot connect to backend server. Please ensure the server is running on port 3001.`;
-        document.body.appendChild(errorDiv);
-        
-        setTimeout(() => {
-          if (document.body.contains(errorDiv)) {
-            document.body.removeChild(errorDiv);
-          }
-        }, 8000);
-      }
-    };
-    
-    testApiConnectivity();
-  }, []);
 
   // Clear error when switching between login/register
   useEffect(() => {
@@ -212,11 +163,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
       </div>
 
       {/* Weave OS Branding - Professional layout */}
-      <div className="absolute top-8 right-8 text-right">
-        <div className="text-2xl font-bold text-white mb-1 tracking-wide">WEAVE OS</div>
-        <div className="text-sm text-gray-300 font-medium tracking-wider uppercase">
-          Enterprise Operating System
-        </div>
+      <div className="absolute top-8 right-8 text-right flex items-center gap-3">
+        <img 
+          src="/images/logo.png" 
+          alt="Weave OS" 
+          className="w-16 h-16 object-contain"
+        />
       </div>
 
       {/* Professional Login/Register Card */}
@@ -224,9 +176,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
         {/* Minimalist header */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <User size={28} className="text-white" />
+            <img 
+              src="/images/logo.png" 
+              alt="Weave OS" 
+              className="w-8 h-8 object-contain"
+            />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Welcome</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Welcome to Weave OS</h1>
           <p className="text-gray-400 text-sm">
             {isLogin ? 'Sign in to your workspace' : 'Create your account'}
           </p>
@@ -426,7 +382,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
           >
             {isLoading ? (
               <>
-                <Loader size={18} className="animate-spin" />
+                <Loader2 size={18} className="animate-spin" />
                 <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
               </>
             ) : (
@@ -448,7 +404,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthenticated }) => {
       {/* Professional System Info */}
       <div className="absolute bottom-8 left-8 text-gray-400 text-sm">
         <div className="font-semibold">Weave OS v1.0</div>
-        <div className="text-gray-500">Enterprise Browser Platform</div>
       </div>
 
       {/* Minimalist Power Options */}

@@ -2,27 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useWindowStore } from '../store/windowStore';
 import { WallpaperManager, ThemeManager } from '../utils/wallpaperManager';
 import { useTheme, getThemeClasses } from '../hooks/useTheme';
+import { useSettingsStore, type AppSettings } from '../stores/settingsStore';
 
 interface SettingsProps {
   windowId?: string;
-}
-
-// Settings interfaces
-interface AppSettings {
-  theme: 'dark' | 'light' | 'auto';
-  fontSize: number;
-  brightness: number;
-  volume: number;
-  wallpaper: string;
-  language: string;
-  autoSave: boolean;
-  notifications: boolean;
-  soundEffects: boolean;
-  animations: boolean;
-  taskbarPosition: 'bottom' | 'top' | 'left' | 'right';
-  iconSize: 'small' | 'medium' | 'large';
-  showFileExtensions: boolean;
-  doubleClickToOpen: boolean;
 }
 
 interface SettingsCategory {
@@ -31,24 +14,6 @@ interface SettingsCategory {
   icon: string;
   component: React.ComponentType<{ settings: AppSettings; updateSettings: (updates: Partial<AppSettings>) => void }>;
 }
-
-// Default settings
-const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'dark',
-  fontSize: 14,
-  brightness: 80,
-  volume: 50,
-  wallpaper: 'default',
-  language: 'en-US',
-  autoSave: true,
-  notifications: true,
-  soundEffects: true,
-  animations: true,
-  taskbarPosition: 'bottom',
-  iconSize: 'medium',
-  showFileExtensions: true,
-  doubleClickToOpen: true,
-};
 
 // Appearance Settings Component
 const AppearanceSettings = ({ settings, updateSettings }: { settings: AppSettings; updateSettings: (updates: Partial<AppSettings>) => void }) => {
@@ -497,22 +462,6 @@ const SystemSettings = ({ settings, updateSettings }: { settings: AppSettings; u
         <div className="space-y-4">
           <label className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl hover:bg-zinc-700/50 transition-colors cursor-pointer">
             <div className="flex items-center gap-3">
-              <span className="text-xl">🔔</span>
-              <div>
-                <div className="text-white font-medium">Notifications</div>
-                <div className="text-gray-400 text-sm">Show system notifications</div>
-              </div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.notifications}
-              onChange={(e) => updateSettings({ notifications: e.target.checked })}
-              className="w-5 h-5 rounded border-zinc-600/50 bg-zinc-700/50 text-blue-500 focus:ring-blue-400"
-            />
-          </label>
-
-          <label className="flex items-center justify-between p-4 bg-zinc-800/50 rounded-xl hover:bg-zinc-700/50 transition-colors cursor-pointer">
-            <div className="flex items-center gap-3">
               <span className="text-xl">🔊</span>
               <div>
                 <div className="text-white font-medium">Sound Effects</div>
@@ -683,16 +632,13 @@ const Settings = ({ windowId }: SettingsProps = {}) => {
   const { updateWindowState, windows } = useWindowStore();
   const { isLight } = useTheme();
   const theme = getThemeClasses(isLight);
+  const { settings, updateSettings } = useSettingsStore();
   
   // Find current window state
   const currentWindow = windows.find(w => w.id === windowId);
   const settingsState = currentWindow?.savedState?.customData?.settings as any;
   
   const [activeCategory, setActiveCategory] = useState(settingsState?.activeCategory || 'appearance');
-  const [settings, setSettings] = useState<AppSettings>({ 
-    ...DEFAULT_SETTINGS, 
-    ...settingsState?.currentSettings 
-  });
 
   // Save state to window store whenever important state changes
   useEffect(() => {
@@ -700,63 +646,12 @@ const Settings = ({ windowId }: SettingsProps = {}) => {
       updateWindowState(windowId, {
         customData: {
           settings: {
-            activeCategory,
-            currentSettings: settings
+            activeCategory
           }
         }
       });
     }
-  }, [windowId, activeCategory, settings, updateWindowState]);
-
-  // Load settings from localStorage on mount
-  useEffect(() => {
-    const savedSettings = localStorage.getItem('weave-os-settings');
-    if (savedSettings) {
-      const parsed = JSON.parse(savedSettings);
-      setSettings({ ...DEFAULT_SETTINGS, ...parsed });
-      
-      // Initialize theme and wallpaper managers
-      const themeManager = ThemeManager.getInstance();
-      const wallpaperManager = WallpaperManager.getInstance();
-      
-      // Apply saved settings immediately
-      if (parsed.theme) {
-        themeManager.setTheme(parsed.theme);
-      } else {
-        themeManager.initializeFromStorage();
-      }
-      
-      if (parsed.wallpaper) {
-        wallpaperManager.setWallpaper(parsed.wallpaper);
-      } else {
-        wallpaperManager.initializeFromStorage();
-      }
-      
-      if (parsed.brightness) {
-        document.documentElement.style.filter = `brightness(${parsed.brightness}%)`;
-      }
-      if (parsed.fontSize) {
-        document.documentElement.style.setProperty('--font-size-base', `${parsed.fontSize}px`);
-        document.body.style.fontSize = `${parsed.fontSize}px`;
-      }
-      if (parsed.volume) {
-        (window as any).weaveVolume = parsed.volume / 100;
-      }
-    } else {
-      // Initialize with defaults
-      const themeManager = ThemeManager.getInstance();
-      const wallpaperManager = WallpaperManager.getInstance();
-      themeManager.initializeFromStorage();
-      wallpaperManager.initializeFromStorage();
-    }
-  }, []);
-
-  // Save settings to localStorage when changed
-  const updateSettings = (updates: Partial<AppSettings>) => {
-    const newSettings = { ...settings, ...updates };
-    setSettings(newSettings);
-    localStorage.setItem('weave-os-settings', JSON.stringify(newSettings));
-  };
+  }, [windowId, activeCategory, updateWindowState]);
 
   const categories: SettingsCategory[] = [
     { id: 'appearance', name: 'Appearance', icon: '🎨', component: AppearanceSettings },

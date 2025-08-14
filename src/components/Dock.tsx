@@ -1,6 +1,7 @@
 import React from 'react';
 import { useWindowStore } from '../store/windowStore';
 import { DOCK_APPS, getAppConfig } from '../registry/appRegistry';
+import { useSettingsStore } from '../stores/settingsStore';
 
 interface DockProps {
   onAppClick?: (appName: string) => void;
@@ -8,6 +9,16 @@ interface DockProps {
 
 const Dock: React.FC<DockProps> = ({ onAppClick }) => {
   const { isAppOpen } = useWindowStore();
+  const { settings } = useSettingsStore();
+  
+  // Calculate icon size based on settings
+  const getIconSize = () => {
+    switch (settings.iconSize) {
+      case 'small': return 'w-8 h-8';
+      case 'large': return 'w-16 h-16';
+      default: return 'w-12 h-12'; // medium
+    }
+  };
   
   // Get dock apps from registry
   const apps = DOCK_APPS.map(appName => {
@@ -47,11 +58,11 @@ const Dock: React.FC<DockProps> = ({ onAppClick }) => {
           return (
             <div
               key={app.id}
-              className="w-10 h-10 rounded-sm bg-gray-700 bg-opacity-0 hover:bg-opacity-100 transition-all duration-200 flex items-center justify-center cursor-pointer group relative"
+              className={`${getIconSize()} rounded-sm bg-gray-700 bg-opacity-0 hover:bg-opacity-100 transition-all duration-200 flex items-center justify-center cursor-pointer group relative`}
               onClick={() => handleAppClick(app.name)}
               title={app.name}
             >
-              <span className="text-lg">{app.icon}</span>
+              <span className={`${settings.iconSize === 'small' ? 'text-sm' : settings.iconSize === 'large' ? 'text-2xl' : 'text-lg'}`}>{app.icon}</span>
               
               {/* Active indicator (orange dot on left side when app is open) */}
               {appIsOpen && (
