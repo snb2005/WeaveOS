@@ -109,7 +109,7 @@ Create a `.env` file in the `server` directory with the following variables:
 
 ```env
 # Database Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/weave-os
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/weave-os
 DB_NAME=weave-os
 
 # Authentication

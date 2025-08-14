@@ -54,7 +54,7 @@ ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:517
 NODE_ENV=production
 PORT=10000
 ALLOWED_ORIGINS=https://weaveos.netlify.app,http://localhost:5173
-MONGODB_URI=mongodb+srv://snb2005:F92TUrJL1q9o7otB@cluster0.zlilfjz.mongodb.net/weave-os
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/weave-os
 # ... other production settings
 ```
 

@@ -48,7 +48,7 @@ Set these environment variables in Render dashboard:
 ```bash
 NODE_ENV=production
 PORT=10000
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/weave-os
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/weave-os
 JWT_SECRET=your-super-secure-jwt-secret
 SESSION_SECRET=your-super-secure-session-secret
 ALLOWED_ORIGINS=https://weaveos.netlify.app,http://localhost:5173
@@ -95,7 +95,7 @@ ENABLE_DEBUG_LOGS=false
 
 ### 2. Connection String
 
-Format: `mongodb+srv://username:password@cluster.mongodb.net/weave-os?retryWrites=true&w=majority`
+Format: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net/weave-os?retryWrites=true&w=majority`
 
 ## 🔧 Local Development
 
