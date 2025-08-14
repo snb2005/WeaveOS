@@ -3,7 +3,31 @@
  * Handles all HTTP requests to the backend server
  */
 
-const API_BASE_URL = 'http://localhost:3001/api';
+// Environment-based API configuration
+const getAPIBaseURL = () => {
+  // Use environment variable if available
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  
+  // Fallback to environment detection
+  if (import.meta.env.DEV || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3001/api';
+  }
+  
+  // Production mode - use Render backend
+  return 'https://weaveos.onrender.com/api';
+};
+
+const API_BASE_URL = getAPIBaseURL();
+
+// Log the configuration for debugging
+console.log('🔧 API Configuration:', {
+  baseURL: API_BASE_URL,
+  environment: import.meta.env.MODE,
+  isDev: import.meta.env.DEV,
+  hostname: window.location.hostname
+});
 
 class ApiClient {
   constructor() {
