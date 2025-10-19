@@ -7,7 +7,18 @@ const morgan = require('morgan');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const rateLimit = require('express-rate-limit');
+
+// Load environment variables from .env file (for local development)
+// In production (Render), these come from Render's environment settings
 require('dotenv').config();
+
+// Log environment on startup for debugging
+console.log('🔧 Loading environment variables...');
+console.log(`📊 NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+console.log(`🔌 PORT: ${process.env.PORT || 'not set'}`);
+console.log(`🗄️  MongoDB URI configured: ${process.env.MONGODB_URI ? 'YES' : 'NO'}`);
+console.log(`🔐 Session secret configured: ${process.env.SESSION_SECRET ? 'YES' : 'NO'}`);
+console.log(`🔑 JWT secret configured: ${process.env.JWT_SECRET ? 'YES' : 'NO'}`);
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -93,7 +104,9 @@ app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV 
+    environment: process.env.NODE_ENV || 'development',
+    nodeVersion: process.version,
+    platform: process.platform
   });
 });
 
@@ -119,8 +132,9 @@ const PORT = process.env.PORT || 3001;
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
     console.log(`🚀 Weave OS Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+    console.log(`✅ Server started successfully at ${new Date().toISOString()}`);
   });
 }
 

@@ -15,6 +15,15 @@ services:
         value: production
       - key: PORT
         value: 10000
+      # IMPORTANT: The following variables MUST be set in Render Dashboard
+      # because render.yaml values are NOT private (they're in git)
+      # Go to: Dashboard > Service > Environment
+      # Add these manually:
+      # - MONGODB_URI
+      # - SESSION_SECRET  
+      # - JWT_SECRET
+      # - ALLOWED_ORIGINS (e.g., https://weaveos.netlify.app)
+      # - ENABLE_CORS_CREDENTIALS (set to: true)
       # IMPORTANT: Add these environment variables in Render Dashboard
       # Go to your service settings > Environment and add:
       # - MONGODB_URI: Your MongoDB connection string
