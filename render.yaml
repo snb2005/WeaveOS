@@ -1,0 +1,39 @@
+services:
+  # Backend Service
+  - type: web
+    name: weaveos-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # IMPORTANT: Add these environment variables in Render Dashboard
+      # Go to your service settings > Environment and add:
+      # - MONGODB_URI: Your MongoDB connection string
+      # - SESSION_SECRET: A strong random secret (use a password generator)
+      # - JWT_SECRET: A strong random secret (different from SESSION_SECRET)
+      # - ALLOWED_ORIGINS: Your Netlify domain (e.g., https://weaveos.netlify.app)
+      # - ENABLE_CORS_CREDENTIALS: true
+      # - RATE_LIMIT_WINDOW_MS: 900000
+      # - RATE_LIMIT_MAX_REQUESTS: 100
+      # If using Cloudinary for media:
+      # - CLOUDINARY_CLOUD_NAME: Your Cloudinary cloud name
+      # - CLOUDINARY_API_KEY: Your Cloudinary API key
+      # - CLOUDINARY_API_SECRET: Your Cloudinary API secret
+
+  # Database (if using Render's managed MongoDB - optional)
+  # - type: pserv
+  #   name: weave-mongodb
+  #   env: docker
+  #   region: oregon
+  #   plan: free
+  #   disk:
+  #     name: weave-data
+  #     mountPath: /data
+  #     sizeGB: 1
