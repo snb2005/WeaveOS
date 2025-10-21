@@ -251,9 +251,19 @@ const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         
         try {
-          await get().refreshUser();
+          // Add timeout to prevent infinite loading
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Auth initialization timeout')), 10000)
+          );
+          
+          await Promise.race([
+            get().refreshUser(),
+            timeoutPromise
+          ]);
         } catch (error) {
           console.error('Auth initialization error:', error);
+          // Clear token if auth check fails
+          localStorage.removeItem('authToken');
           set({
             user: null,
             isAuthenticated: false,

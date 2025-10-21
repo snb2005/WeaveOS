@@ -49,10 +49,22 @@ class ApiClient {
 
   // Helper method to handle responses
   async handleResponse(response) {
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      // If response is not JSON, throw generic error
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
     if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      const errorMessage = data.error || data.message || `HTTP error! status: ${response.status}`;
+      console.error('❌ API Error:', {
+        status: response.status,
+        message: errorMessage,
+        url: response.url
+      });
+      throw new Error(errorMessage);
     }
     
     return data;
@@ -131,12 +143,21 @@ class ApiClient {
   }
 
   async getCurrentUser() {
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
-      headers: this.getHeaders(),
-      credentials: 'include'
-    });
+    console.log('👤 Fetching current user from:', `${API_BASE_URL}/auth/me`);
     
-    return this.handleResponse(response);
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: this.getHeaders(),
+        credentials: 'include'
+      });
+      
+      console.log('👤 Get user response status:', response.status);
+      
+      return this.handleResponse(response);
+    } catch (error) {
+      console.error('❌ Get current user error:', error);
+      throw error;
+    }
   }
 
   async changePassword(passwordData) {

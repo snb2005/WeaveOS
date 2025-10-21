@@ -18,14 +18,19 @@ function App() {
     toggleFullscreen
   } = useWindowManager();
 
-  const { initialize, isAuthenticated, isLoading } = useAuthStore();
+  const { initialize, isAuthenticated, isLoading, error } = useAuthStore();
   const [authChecked, setAuthChecked] = useState(false);
   
   // Initialize authentication state
   useEffect(() => {
     const initAuth = async () => {
-      await initialize();
-      setAuthChecked(true);
+      try {
+        await initialize();
+      } catch (e) {
+        console.error('Failed to initialize auth:', e);
+      } finally {
+        setAuthChecked(true);
+      }
     };
     initAuth();
   }, [initialize]);    
@@ -62,6 +67,7 @@ function App() {
   };
 
   // Show loading screen while checking authentication
+  // But show error state if auth check fails
   if (!authChecked || isLoading) {
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center">
@@ -95,31 +101,49 @@ function App() {
             </div>
           </div>
           
-          {/* Professional loading spinner */}
+          {/* Professional loading spinner or error */}
           <div className="space-y-6">
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="w-12 h-12 border-4 border-gray-700 rounded-full animate-spin border-t-blue-500"></div>
-                <div className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full animate-pulse border-t-blue-400"></div>
+            {!error ? (
+              <>
+                <div className="flex justify-center">
+                  <div className="relative">
+                    <div className="w-12 h-12 border-4 border-gray-700 rounded-full animate-spin border-t-blue-500"></div>
+                    <div className="absolute inset-0 w-12 h-12 border-4 border-transparent rounded-full animate-pulse border-t-blue-400"></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <p className="text-white text-lg font-medium">Loading Workspace</p>
+                  <p className="text-gray-400 text-sm">Please wait while we prepare your environment...</p>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-yellow-500">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-white text-lg font-medium">Connection Issue</p>
+                  <p className="text-gray-400 text-sm">Unable to connect to the server. Redirecting to login...</p>
+                </div>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <p className="text-white text-lg font-medium">Loading Workspace</p>
-              <p className="text-gray-400 text-sm">Please wait while we prepare your environment...</p>
-            </div>
+            )}
           </div>
           
           {/* Loading progress indicator */}
-          <div className="w-64 bg-gray-800 rounded-full h-1 mx-auto">
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 rounded-full animate-pulse" style={{ width: '70%' }}></div>
-          </div>
+          {!error && (
+            <div className="w-64 bg-gray-800 rounded-full h-1 mx-auto">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+            </div>
+          )}
         </div>
         
         {/* Footer info */}
         <div className="absolute bottom-8 text-center w-full">
           <p className="text-gray-500 text-sm">
-            Powered by advanced web technologies
+            {error ? 'Please check your internet connection' : 'Powered by advanced web technologies'}
           </p>
         </div>
       </div>
