@@ -552,28 +552,31 @@ router.post('/folder', async (req, res) => {
     }
 
     const { name, path } = value;
-    const fullPath = `${path}/${name}`.replace(/\/+/g, '/');
+
+    console.log(`📁 Creating folder - name: ${name}, parent path: ${path}`);
 
     // Check if folder already exists
     const existingFolder = await File.findOne({
       filename: name,
-      path: path,
+      path: path,  // Check in the parent directory
       owner: req.user._id,
       isDirectory: true,
       isDeleted: false
     });
 
     if (existingFolder) {
+      console.log(`❌ Folder already exists: ${name} in ${path}`);
       return res.status(409).json({
         error: 'Folder already exists'
       });
     }
 
     // Create folder document
+    // The path should be the PARENT directory, not the full path
     const folder = new File({
       filename: name,
       originalName: name,
-      path: fullPath,
+      path: path,  // Parent directory path (where this folder lives)
       size: 0,
       mimeType: 'application/x-directory',
       owner: req.user._id,
@@ -585,6 +588,8 @@ router.post('/folder', async (req, res) => {
     });
 
     await folder.save();
+
+    console.log(`✅ Folder created: ${name} at ${path} with id: ${folder._id}`);
 
     res.status(201).json({
       message: 'Folder created successfully',
